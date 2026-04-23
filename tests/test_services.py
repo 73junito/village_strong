@@ -2,9 +2,6 @@ import asyncio
 import os
 import pytest
 
-import sys
-sys.path.append(r'g:/village strong/src')
-
 from app.db import get_session, init_db
 from app import models
 from app.services import create_attempt, autosave_attempt, submit_attempt, ags_sync_attempt
