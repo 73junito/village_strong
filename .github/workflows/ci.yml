@@ -43,9 +43,8 @@ jobs:
           python -m pip install pytest pytest-asyncio coverage pytest-cov
 
       - name: Run tests (with coverage)
-        working-directory: src
         run: |
-          python -m pytest --cov=app --cov-report=xml:coverage.xml -q
+          PYTHONPATH=src python -m pytest tests --cov=app --cov-report=xml:src/coverage.xml -q
 
       - name: Upload coverage artifact
         if: always()
