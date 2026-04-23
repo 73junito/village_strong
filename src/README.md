@@ -18,4 +18,4 @@ uvicorn app.main:app --reload --port 8000
 
 Notes:
 - The routers and services are stubs with TODOs for JWT/LTI validation, DB wiring, and AGS posting.
-- Next steps: implement SQLAlchemy models, Alembic migrations, and proper LTI JWT verification.
+- Next steps: add Alembic migrations, finish database wiring around the existing SQLAlchemy models, and harden LTI/JWT verification.
