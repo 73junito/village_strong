@@ -1,6 +1,8 @@
+import os
 import sqlite3
 import sys
-p = r"g:/village strong/dev.db"
+default_db_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'dev.db')
+p = sys.argv[1] if len(sys.argv) > 1 else os.environ.get('DB_PATH', default_db_path)
 try:
     conn = sqlite3.connect(p)
 except Exception as e:
