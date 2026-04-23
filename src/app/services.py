@@ -279,21 +279,33 @@ async def submit_attempt(attempt_id: int) -> Optional[SubmitResponse]:
         res_items = await session.execute(stmt_items)
         attempt_items = res_items.scalars().all()
 
+        item_ids = list({ai.item_id for ai in attempt_items if ai.item_id is not None})
+        items_by_id = {}
+        assessment_items_by_item_id = {}
+        if item_ids:
+            stmt_q = select(Item).where(Item.id.in_(item_ids))
+            qr = await session.execute(stmt_q)
+            items_by_id = {item.id: item for item in qr.scalars().all()}
+
+            stmt_ass_items = select(AssessmentItem).where(
+                AssessmentItem.assessment_id == attempt.assessment_id,
+                AssessmentItem.item_id.in_(item_ids),
+            )
+            rai = await session.execute(stmt_ass_items)
+            assessment_items_by_item_id = {
+                ass_item.item_id: ass_item for ass_item in rai.scalars().all()
+            }
+
         total_score = 0.0
         total_max = 0.0
 
         for ai in attempt_items:
-            # load question
-            stmt_q = select(Item).where(Item.id == ai.item_id)
-            qr = await session.execute(stmt_q)
-            q = qr.scalar_one_or_none()
+            q = items_by_id.get(ai.item_id)
             if not q:
                 continue
             max_score = 1.0
             # find associated assessment_item to get points if present
-            stmt_ass_item = select(AssessmentItem).where(AssessmentItem.item_id == q.id, AssessmentItem.assessment_id == attempt.assessment_id)
-            rai = await session.execute(stmt_ass_item)
-            ass_item = rai.scalar_one_or_none()
+            ass_item = assessment_items_by_item_id.get(q.id)
             if ass_item and ass_item.points:
                 max_score = float(ass_item.points)
 
