@@ -207,7 +207,7 @@ async def create_attempt(req: CreateAttemptRequest) -> AttemptOut:
         session.add(attempt)
         await session.commit()
         await session.refresh(attempt)
-        return AttemptOut(id=attempt.id, assessment_id=attempt.assessment_id, user_id=attempt.user_id, status=attempt.status, started_at=attempt.created_at.isoformat())
+        return AttemptOut(id=attempt.id, assessment_id=attempt.assessment_id, user_id=attempt.user_id, status=attempt.status, started_at=attempt.started_at.isoformat())
 
 
 async def autosave_attempt(attempt_id: int, req: AutosaveRequest) -> bool:
