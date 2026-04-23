@@ -137,6 +137,8 @@ async def request_client_token(token_url: str, client_id: str, scope: str, priva
         j = r.json()
 
     access_token = j.get("access_token")
+    if not isinstance(access_token, str) or not access_token.strip():
+        raise ValueError("Token endpoint response did not include a valid access_token")
     expires_in = int(j.get("expires_in", 3600))
     set_token(token_url, client_id, scope, access_token, expires_in)
     return access_token
