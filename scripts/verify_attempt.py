@@ -38,7 +38,7 @@ async def main(attempt_id=None):
         rows = r2.scalars().all()
         print(f"Found {len(rows)} GradeSyncRecord(s)")
         for g in rows:
-            print(g.id, g.status, getattr(g, "response_code", None))
+            print(g.id, g.status, g.last_error)
 
     return 0
 
