@@ -2,65 +2,95 @@ name: CI
 
 on:
   push:
-    branches: [ main, master ]
+    branches: [main, master]
   pull_request:
-    branches: [ main, master ]
+    branches: [main, master]
 
 jobs:
   test:
+    name: Python ${{ matrix.python-version }}
     runs-on: ubuntu-latest
-      strategy:
+
+    strategy:
       fail-fast: false
       matrix:
-        python-version: [3.11, 3.12, 3.14]
+        python-version: ["3.11", "3.12", "3.14"]
 
     steps:
       - name: Checkout
         uses: actions/checkout@v4
 
       - name: Set up Python
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@v5
         with:
           python-version: ${{ matrix.python-version }}
-
-      - name: Cache pip
-        uses: actions/cache@v4
-        with:
-          path: ~/.cache/pip
-          key: ${{ runner.os }}-pip-${{ hashFiles('src/requirements.txt') }}
-          restore-keys: |
-            ${{ runner.os }}-pip-
+          cache: pip
+          cache-dependency-path: src/requirements.txt
 
       - name: Install dependencies
         working-directory: src
         run: |
           python -m pip install --upgrade pip
           python -m pip install -r requirements.txt
-
-      - name: Install test dependencies
-        working-directory: src
-        run: |
           python -m pip install pytest pytest-asyncio coverage pytest-cov
 
-      - name: Run tests (with coverage)
+      - name: Run tests with coverage
         run: |
-          PYTHONPATH=src python -m pytest tests --cov=app --cov-report=xml:src/coverage.xml -q
+          PYTHONPATH=src python -m pytest tests \
+            --cov=app \
+            --cov-report=xml:src/coverage.xml \
+            -q
 
       - name: Upload coverage artifact
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: coverage-report
+          name: coverage-report-python-${{ matrix.python-version }}
           path: src/coverage.xml
+          if-no-files-found: warn
 
   lint:
+    name: Python lint placeholder
     runs-on: ubuntu-latest
+
     steps:
       - name: Checkout
         uses: actions/checkout@v4
 
       - name: Lint placeholder
-        run: |
-          echo "Lint/type-check job placeholder — add flake8/mypy later"
-        # keep working-directory stable for future lint commands
         working-directory: src
+        run: echo "Lint/type-check job placeholder — add Ruff or mypy later"
+
+  web:
+    name: Web build and test
+    runs-on: ubuntu-latest
+
+    defaults:
+      run:
+        working-directory: apps/web
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+          cache-dependency-path: apps/web/package-lock.json
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Build
+        run: npm run build
+
+      - name: Test rendered output
+        run: node --test tests/rendered-html.test.mjs
+
+      - name: Validate Cloudflare deployment bundle
+        run: npx wrangler deploy --dry-run
