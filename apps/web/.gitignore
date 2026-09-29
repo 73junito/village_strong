@@ -29,6 +29,14 @@ yarn-error.log*
 
 # env files (can opt-in for committing if needed)
 .env*
+.envrc
+
+# Cloudflare local development secrets. `.dev.vars` holds real secret values
+# and must never be committed. `.dev.vars.*` covers per-environment variants
+# such as `.dev.vars.production`; the committed example stays tracked.
+.dev.vars
+.dev.vars.*
+!.dev.vars.example
 
 # vercel
 .vercel

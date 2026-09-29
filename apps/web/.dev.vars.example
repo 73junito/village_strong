@@ -1,0 +1,15 @@
+# Cloudflare local development secrets for `wrangler dev` / `npm run dev`.
+#
+# Copy this file to `.dev.vars` and fill in real values. `.dev.vars` is
+# gitignored and must never be committed.
+#
+#   cp .dev.vars.example .dev.vars
+#
+# Secrets are NOT uploaded by `wrangler deploy`. Push them explicitly with:
+#
+#   npx wrangler secret put <NAME>
+#
+# Add one KEY=value pair per line. Lines starting with # are comments.
+
+# Example placeholder. Replace with a real secret before using it.
+EXAMPLE_SECRET=replace-me

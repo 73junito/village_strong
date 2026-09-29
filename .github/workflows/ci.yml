@@ -92,5 +92,7 @@ jobs:
       - name: Test rendered output
         run: node --test tests/rendered-html.test.mjs
 
+      # Bundles the Worker and prints the binding table without writing to the
+      # Cloudflare API, so config regressions fail here before any deploy.
       - name: Validate Cloudflare deployment bundle
-        run: npx wrangler deploy --dry-run
+        run: npm run deploy:check

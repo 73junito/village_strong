@@ -6,14 +6,22 @@
     "node": ">=22.13.0"
   },
   "scripts": {
-    "install:ci": "bash scripts/install-ci.sh",
-    "dev": "WRANGLER_LOG_PATH=.wrangler/wrangler.log vite",
-    "build": "bash scripts/build-verified.sh",
-    "start": "WRANGLER_LOG_PATH=.wrangler/wrangler.log vinext start",
+    "install:ci": "node scripts/install-ci.mjs",
+    "dev": "vite",
+    "build": "node scripts/build-verified.mjs",
+    "start": "vinext start",
     "test": "npm run build && node --test tests/rendered-html.test.mjs",
-    "validate:artifact": "bash scripts/validate-artifact.sh",
-    "lint": "bash scripts/sites-env.sh -- eslint . --ignore-pattern dist --ignore-pattern .next",
-    "db:generate": "bash scripts/sites-env.sh -- drizzle-kit generate"
+    "validate:artifact": "node scripts/validate-artifact.mjs",
+    "lint": "eslint . --ignore-pattern dist --ignore-pattern .next",
+    "db:generate": "drizzle-kit generate",
+    "preview": "npm run build && wrangler dev",
+    "deploy": "npm run build && wrangler deploy",
+    "deploy:dry-run": "npm run build && wrangler deploy --dry-run",
+    "deploy:check": "wrangler deploy --dry-run",
+    "cf:whoami": "wrangler whoami",
+    "cf:tail": "wrangler tail",
+    "cf:versions": "wrangler versions list",
+    "cf:secret:list": "wrangler secret list"
   },
   "dependencies": {
     "drizzle-orm": "0.45.2",
