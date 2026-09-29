@@ -1,6 +1,9 @@
 {
   "$schema": "node_modules/wrangler/config-schema.json",
-  "name": "village-strong-family-foundation",
+  // Must match the deployed Worker name. The live Worker serving
+  // villagestrongfoundation.org and www is `village-strong`; a different name
+  // here makes Wrangler create a second Worker instead of updating this one.
+  "name": "village-strong",
   "main": "worker/index.ts",
   "compatibility_date": "2026-07-29",
   "compatibility_flags": ["nodejs_compat"],
@@ -13,10 +16,11 @@
     "binding": "ASSETS"
   },
 
-  // Cloudflare Images backs the vinext image optimizer. This binding only
-  // resolves once the Images product is enabled on the account; see
-  // CLOUDFLARE.md. No route currently requests /_vinext/image, so the site
-  // still serves correctly when Images is unavailable.
+  // Cloudflare Images backs the vinext image optimizer. worker/index.ts reads
+  // env.IMAGES on the /_vinext/image path, so the binding is kept even though
+  // no page currently requests that route; the app serves plain <img> tags.
+  // This is a paid product. Removing the binding would also require deleting
+  // the /_vinext/image branch from worker/index.ts. See CLOUDFLARE.md.
   "images": {
     "binding": "IMAGES"
   },
