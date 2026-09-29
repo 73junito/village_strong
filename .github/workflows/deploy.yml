@@ -26,6 +26,24 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      # Fail fast and loudly. Without these the deploy step fails deep in
+      # Wrangler's auth handling, after a full lint/build/test cycle has
+      # already run, and the real cause is easy to miss.
+      - name: Check required secrets are configured
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: |
+          missing=0
+          for name in CLOUDFLARE_API_TOKEN CLOUDFLARE_ACCOUNT_ID; do
+            if [ -z "${!name}" ]; then
+              echo "::error title=Missing secret::$name is not set. Add it under" \
+                "Settings -> Secrets and variables -> Actions -> New repository secret."
+              missing=1
+            fi
+          done
+          exit "$missing"
+
       - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
@@ -50,11 +68,25 @@ jobs:
         run: npm run deploy:check
 
       - name: Deploy to Cloudflare
+        id: deploy
         run: npx wrangler deploy
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
 
+      # Reports the real outcome. A previous version used `if: always()` with a
+      # hardcoded success message, so a failed deploy still printed "Deployed".
       - name: Summary
         if: always()
-        run: echo "Deployed ${{ github.sha }} to Worker village-strong-family-foundation"
+        env:
+          DEPLOY_OUTCOME: ${{ steps.deploy.outcome }}
+        run: |
+          if [ "$DEPLOY_OUTCOME" = "success" ]; then
+            echo "::notice title=Deployed::Worker village-strong-family-foundation" \
+              "is live at commit ${GITHUB_SHA}."
+            echo "Custom domains (if enabled): villagestrongfoundation.org, www.villagestrongfoundation.org"
+          else
+            echo "::error title=Deploy failed::Cloudflare did not accept the deployment" \
+              "(outcome: ${DEPLOY_OUTCOME}). Production is unchanged."
+            echo "The previously deployed Worker version, if any, is still serving traffic."
+          fi
