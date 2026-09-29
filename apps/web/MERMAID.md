@@ -14,5 +14,4 @@ flowchart TD
     Application --> Village["/village-strong<br/>Childhood Science: Birth–18"]
 
     Worker --> D1["Cloudflare D1<br/>DB binding"]
-    Worker --> Media["Cloudflare Images<br/>IMAGES binding"]
 ```
