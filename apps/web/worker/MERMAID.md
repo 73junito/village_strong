@@ -9,6 +9,5 @@ flowchart TD
     Worker --> Static["Vinext Static Assets"]
     Worker --> Server["Vinext Server Bundle"]
     Worker --> D1["Cloudflare D1<br/>DB"]
-    Worker --> Images["Cloudflare Images<br/>IMAGES"]
     Worker --> Response["HTTP Response"]
 ```

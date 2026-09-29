@@ -75,6 +75,9 @@ The first deploy creates the Worker, and Wrangler prints its `*.workers.dev`
 hostname. Later deploys update the Worker and roll forward its version history.
 
 ```bash
+npm run cf:versions        # inspect live versions
+npm run cf:tail            # stream Workers Logs
+```
 
 ## Custom domain
 
@@ -96,10 +99,13 @@ Verified zone details:
 | Account      | `0257b4518015b64bd28bca05b803de27`        |
 | Name servers | `kinsley.ns.cloudflare.com`, `zod.ns.cloudflare.com` |
 
-A zone export taken before this configuration contained only SOA and NS
-records — no A, AAAA, or CNAME — so no existing site was displaced. A custom
-domain only takes effect once the Worker is deployed; before that, and
-alongside it, the `*.workers.dev` hostname also serves the app.
+The `workers_dev` preview is enabled, so the `*.workers.dev` hostname also
+serves the app alongside the custom domains.
+
+> The apex and `www` hostnames are attached to the Worker as **custom-domain
+> route bindings**, which is why the earlier zone export looked "empty": those
+> hostnames produce no A/AAAA/CNAME rows in a zone export. Do not create DNS
+> records for them — a proxy record would collide with the route binding.
 
 ### Redirecting www to the apex
 
@@ -137,16 +143,28 @@ stays documented.
 
 `wrangler.jsonc` declares the bindings the Worker reads:
 
-| Binding  | Resource          | Purpose                                          |
-| -------- | ----------------- | ------------------------------------------------ |
-| `ASSETS` | Static assets     | Serves `dist/client`; used by the image optimizer |
-| `IMAGES` | Cloudflare Images | Backs `/_vinext/image` optimization              |
+| Binding  | Resource      | Purpose                                                            |
+| -------- | ------------- | ------------------------------------------------------------------ |
+| `ASSETS` | Static assets | Serves `dist/client`; read by vinext's app router on every request |
 
-> **Cloudflare Images is a paid product.** The `IMAGES` binding only resolves
-> once Images is enabled on the account. No route currently requests
-> `/_vinext/image`, so the site serves correctly either way. If a deploy fails
-> with an Images-related error, either enable the product or temporarily remove
-> the `images` block from `wrangler.jsonc`.
+There is no `IMAGES` binding. The Worker previously exposed a `/_vinext/image`
+route backed by a Cloudflare Images binding, and that binding was kept even
+though no page rendered the route. Nothing in `app/` imports `next/image` (the
+pages serve plain `<img>` tags), Cloudflare Images is a paid product that is not
+provisioned in this account, and the route answered every request with HTTP 500
+— so the route, the binding, and the `IMAGES` entry in the `Env` type were all
+removed together.
+
+To re-enable image optimization, do all three in one change:
+
+1. Provision Cloudflare Images, then add `"images": { "binding": "IMAGES" }`
+   back to `wrangler.jsonc`.
+2. Re-add the `/_vinext/image` branch to `worker/index.ts`. It has to supply
+   both `fetchAsset` (from `env.ASSETS`) and `transformImage` (from `env.IMAGES`).
+3. Start using `next/image` on the pages that need it.
+
+Restoring only the binding leaves an unused paid-service binding; restoring only
+the route causes requests to fail because `env.IMAGES` is undefined.
 
 ### Adding D1
 
@@ -178,10 +196,21 @@ degrades cleanly when D1 is not configured. Schema changes flow through
 
 ## Continuous deployment
 
-`.github/workflows/deploy.yml` builds and deploys on pushes to `main` and on
-manual dispatch. It requires the `CLOUDFLARE_API_TOKEN` and
-`CLOUDFLARE_ACCOUNT_ID` secrets. `ci.yml` independently runs `deploy:check` on
-every push, so a broken bundle fails before it can ship.
+Production is deployed by **Cloudflare Workers Builds**, connected to this
+repository in the Cloudflare dashboard (**Workers & Pages → Build settings**).
+Its configured commands are `cd apps/web && npm ci && npm run build` and
+`cd apps/web && npx wrangler deploy` on branch `main`. Because that deploy runs
+`wrangler deploy` in `apps/web`, it reads this directory's `wrangler.jsonc`, so
+the Worker `name` here must match the deployed Worker or a second one is
+created.
+
+`.github/workflows/deploy.yml` is **manual-only** (`workflow_dispatch`) and its
+secrets are deliberately not configured. It exists as an emergency fallback;
+leave the Cloudflare build as the normal path so a commit is published once.
+
+`ci.yml` is the CI layer and does not deploy. It independently runs
+`deploy:check` on every push and PR, so a broken bundle fails before a human
+ever triggers a release.
 
 ## Troubleshooting
 
@@ -202,7 +231,3 @@ Run `npm run deploy` once; later commands resolve it.
 
 **`wrangler deploy` misbehaves on Windows** — run it from PowerShell or cmd, not
 inside WSL, so the native Windows binary is used.
-
-npm run cf:versions        # inspect live versions
-npm run cf:tail            # stream Workers Logs
-```

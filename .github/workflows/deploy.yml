@@ -1,8 +1,18 @@
-name: Deploy to Cloudflare
+name: Deploy to Cloudflare (manual only)
 
+# Production is deployed by Cloudflare Workers Builds, which is connected to
+# this GitHub repository in the Cloudflare dashboard (Settings -> Builds).
+# That integration builds on pushes to `main` and is the ONLY production
+# deployment path. This workflow is intentionally not triggered by `push`:
+# running both would publish the same commit twice through competing paths.
+#
+# This workflow remains available as a documented manual/emergency option
+# (Actions -> Deploy to Cloudflare -> Run workflow). It requires the
+# CLOUDFLARE_API_TOKEN and CLOUDFLARE_ACCOUNT_ID repository secrets, which are
+# intentionally NOT configured. Prefer the Cloudflare dashboard build; use this
+# only when that path is unavailable or broken.
 on:
-  push:
-    branches: [main]
+  # No `push` trigger on purpose. See the note above.
   workflow_dispatch:
 
 # Allow only one deployment at a time; queue rather than cancel in-flight runs.
@@ -25,6 +35,26 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+
+      # This manual path needs repository secrets. They are intentionally NOT
+      # configured, because the normal deployment path is Cloudflare's own Git
+      # integration. If you are running this on purpose, add them under
+      # Settings -> Secrets and variables -> Actions -> New repository secret.
+      - name: Check required secrets are configured
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: |
+          missing=0
+          for name in CLOUDFLARE_API_TOKEN CLOUDFLARE_ACCOUNT_ID; do
+            if [ -z "${!name}" ]; then
+              echo "::error title=Missing secret::$name is not set. This manual" \
+                "workflow needs it; the normal path is the Cloudflare dashboard build" \
+                "(Settings -> Builds), which requires no repository secrets."
+              missing=1
+            fi
+          done
+          exit "$missing"
 
       - name: Set up Node.js
         uses: actions/setup-node@v4
@@ -50,11 +80,27 @@ jobs:
         run: npm run deploy:check
 
       - name: Deploy to Cloudflare
+        id: deploy
         run: npx wrangler deploy
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
 
+      # Reports the real outcome. A previous version used `if: always()` with a
+      # hardcoded success message, so a failed deploy still printed "Deployed".
       - name: Summary
         if: always()
-        run: echo "Deployed ${{ github.sha }} to Worker village-strong-family-foundation"
+        env:
+          DEPLOY_OUTCOME: ${{ steps.deploy.outcome }}
+        run: |
+          if [ "$DEPLOY_OUTCOME" = "success" ]; then
+            echo "::notice title=Deployed::Worker village-strong" \
+              "is live at commit ${GITHUB_SHA}."
+            echo "Custom domains: villagestrongfoundation.org, www.villagestrongfoundation.org"
+            echo "Note: this manual path and the Cloudflare Git integration both" \
+              "write the same Worker. Confirm which one published this commit."
+          else
+            echo "::error title=Deploy failed::Cloudflare did not accept the deployment" \
+              "(outcome: ${DEPLOY_OUTCOME}). Production is unchanged."
+            echo "The previously deployed Worker version, if any, is still serving traffic."
+          fi
