@@ -143,17 +143,28 @@ stays documented.
 
 `wrangler.jsonc` declares the bindings the Worker reads:
 
-| Binding  | Resource          | Purpose                                          |
-| -------- | ----------------- | ------------------------------------------------ |
-| `ASSETS` | Static assets     | Serves `dist/client`; used by the image optimizer |
-| `IMAGES` | Cloudflare Images | Backs `/_vinext/image` optimization              |
+| Binding  | Resource      | Purpose                                                            |
+| -------- | ------------- | ------------------------------------------------------------------ |
+| `ASSETS` | Static assets | Serves `dist/client`; read by vinext's app router on every request |
 
-> **Cloudflare Images is a paid product.** `worker/index.ts` calls `env.IMAGES`
-> when a request reaches `/_vinext/image`, so the binding is referenced by the
-> Worker even though no page currently renders that route (pages use plain
-> `<img>` tags). Do not delete the `images` block on its own — remove the
-> `/_vinext/image` branch in `worker/index.ts` in the same change, or that path
-> will throw if it is ever requested.
+There is no `IMAGES` binding. The Worker previously exposed a `/_vinext/image`
+route backed by a Cloudflare Images binding, and that binding was kept even
+though no page rendered the route. Nothing in `app/` imports `next/image` (the
+pages serve plain `<img>` tags), Cloudflare Images is a paid product that is not
+provisioned in this account, and the route answered every request with HTTP 500
+— so the route, the binding, and the `IMAGES` entry in the `Env` type were all
+removed together.
+
+To re-enable image optimization, do all three in one change:
+
+1. Provision Cloudflare Images, then add `"images": { "binding": "IMAGES" }`
+   back to `wrangler.jsonc`.
+2. Re-add the `/_vinext/image` branch to `worker/index.ts`. It has to supply
+   both `fetchAsset` (from `env.ASSETS`) and `transformImage` (from `env.IMAGES`).
+3. Start using `next/image` on the pages that need it.
+
+Restoring only the binding leaves an unused paid-service binding; restoring only
+the route causes requests to fail because `env.IMAGES` is undefined.
 
 ### Adding D1
 
