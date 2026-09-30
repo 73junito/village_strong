@@ -92,18 +92,37 @@ test("every sitemap URL renders the verified application", async () => {
   }
 });
 
-test("serves robots.txt pointing crawlers at the sitemap", async () => {
+// T-H4 repair (2026-09-30): the app is the authoritative source of the whole file.
+// Cloudflare's documented prepend did NOT happen in production - the managed
+// notice disappeared the moment this route answered 200 - so the reservation of
+// rights and the Sitemap reference must both come from here, exactly once each.
+// A second copy is not harmless either: it is the signature of the edge starting
+// to prepend again, which is what verify-deploy.ps1 also refuses.
+function countMatches(text, pattern) {
+  return [...text.matchAll(pattern)].length;
+}
+
+test("serves robots.txt with the Article 4 reservation and the sitemap", async () => {
   const response = await fetchFromWorker("/robots.txt");
   assert.equal(response.status, 200);
   assert.match(response.headers.get("content-type") ?? "", /^text\/plain\b/i);
 
   const text = await response.text();
   assert.match(text, /^User-Agent: \*$/m);
+  assert.match(text, /^Content-signal: search=yes, ai-train=no$/m);
   assert.match(text, /^Allow: \/$/m);
   assert.match(text, /^Disallow: \/_vinext\/$/m);
   assert.match(text, /^Sitemap: https:\/\/villagestrongfoundation\.org\/sitemap\.xml$/m);
-  // Cloudflare PREPENDS its managed content-signal notice (including the Article
-  // 4 reservation) to this response at the edge, so the app must not repeat that
-  // text: duplication would ship the notice twice in one file.
-  assert.doesNotMatch(text, /EUROPEAN UNION DIRECTIVE/i);
+
+  // The notice leads the file and carries the reservation verbatim.
+  assert.match(text, /^# As a condition of accessing this website, you agree to abide by the$/m);
+  assert.match(text, /^# RIGHTS UNDER ARTICLE 4 OF THE EUROPEAN UNION DIRECTIVE 2019\/790 ON COPYRIGHT$/m);
+
+  assert.equal(
+    countMatches(text, /EUROPEAN UNION DIRECTIVE 2019\/790/gi),
+    1,
+    "the Article 4 reservation of rights must appear exactly once",
+  );
+  assert.equal(countMatches(text, /^Sitemap:/gim), 1, "exactly one Sitemap reference");
+  assert.equal(countMatches(text, /^User-Agent:/gim), 1, "exactly one User-Agent group");
 });
