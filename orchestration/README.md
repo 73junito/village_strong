@@ -136,6 +136,12 @@ deployment is a broken deployment, never an open one.
 `ORCHESTRATOR_APPROVER`, the identity behind the token; anything the caller
 claims about who they are is overwritten before validation.
 
+If `ORCHESTRATOR_APPROVER` is unset, **approvals fail closed with 503**. There
+is no placeholder identity: an approval signed by `"token-holder"` would
+attribute a release to nobody, which is the same defect as letting the caller
+name themselves. The refusal is scoped to approval — rejecting is always safe,
+and status reads stay available so an operator can diagnose a stuck run.
+
 | Method | Path | Purpose |
 |--------|------|---------|
 | `GET` | `/healthz` | Liveness plus the gate count *(public)* |
@@ -242,11 +248,12 @@ so a regression cannot come back silently.
 
 ## Assumptions and limitations
 
-- **Identity is a token, not a person.** `approvedBy` is derived from the bearer
-  token via `ORCHESTRATOR_APPROVER` and any identity in the request body is
-  discarded. That proves *which credential* signed a release, not which human
-  held it. Replacing the shared token with per-approver credentials (OIDC or
-  mTLS) is required before anyone but an operator can approve.
+- **Identity is a token, not a person.** `approvedBy` is derived from
+  `ORCHESTRATOR_APPROVER` and any identity in the request body is discarded, so
+  a caller cannot sign as somebody else. If `ORCHESTRATOR_APPROVER` is unset,
+  approvals are refused outright. But a single shared token still cannot
+  distinguish the Program Director from anyone else holding it; replacing it
+  with per-approver credentials (OIDC or mTLS) is required before deployment.
 - **The API is single-tenant.** One orchestrator instance (`release-orchestrator`)
   serves every caller. Multi-tenancy is not designed in.
 - **A dispatch failure is visible, not silent.** `dispatchRun` hands creation to

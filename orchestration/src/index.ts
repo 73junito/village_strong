@@ -10,6 +10,12 @@
  */
 import { getAgentByName, routeAgentRequest } from "agents";
 
+import {
+  approvalRefusal,
+  resolveActor,
+  tokensMatch,
+  type Principal,
+} from "./auth.ts";
 import { PIPELINE } from "./pipeline.ts";
 import { OrchestratorAgent } from "./agent.ts";
 import type { ReleaseRequest } from "./workflow.ts";
@@ -69,18 +75,6 @@ type OrchestratorEnv = Env & {
   ORCHESTRATOR_APPROVER?: string;
 };
 
-/**
- * The authenticated caller.
- *
- * `actor` is the identity written into `approvedBy`. It comes from the bearer
- * token, never from the request body, so a caller cannot sign a release as
- * somebody else by putting their name in the JSON.
- */
-interface Principal {
-  actor: string;
-  /** The raw token, kept so a non-identity reason can still be returned. */
-  token: string;
-}
 
 /**
  * Public paths. `/healthz` and `/api/pipeline` expose no content and no run
@@ -90,27 +84,12 @@ interface Principal {
 const PUBLIC_PATHS = new Set(["/healthz", "/api/pipeline"]);
 
 /**
- * Compares two tokens without leaking their contents through timing.
- *
- * A token check that returns early on the first differing character lets an
- * attacker recover the expected value one character at a time, so the loop
- * always runs to completion and folds the difference into an accumulator.
- */
-function tokensMatch(provided: string, expected: string): boolean {
-  if (provided.length !== expected.length) return false;
-
-  let diff = 0;
-  for (let i = 0; i < provided.length; i += 1) {
-    diff |= provided.charCodeAt(i) ^ expected.charCodeAt(i);
-  }
-  return diff === 0;
-}
-
-/**
  * Resolves the caller from the bearer token, or returns a refusal response.
  *
- * Fails closed: if the secret is not configured, nothing is authorised. An
- * unconfigured deployment is a broken deployment, never an open one.
+ * Fails closed on the token: if that secret is missing, nothing is authorised.
+ * An unconfigured deployment is a broken deployment, never an open one. The
+ * approver identity is resolved but NOT defaulted — `approvalRefusal` refuses
+ * approvals when it is absent.
  */
 function authenticate(request: Request, env: OrchestratorEnv): Principal | Response {
   const expected = env.ORCHESTRATOR_API_TOKEN;
@@ -129,12 +108,9 @@ function authenticate(request: Request, env: OrchestratorEnv): Principal | Respo
     return json({ error: "Unauthorized." }, 401);
   }
 
-  // The token holder is the principal. In production this is replaced by a
-  // verified identity (an OIDC subject or an mTLS certificate); until then the
-  // operator behind the token is the only accountable name available.
-  const actor = env.ORCHESTRATOR_APPROVER ?? "token-holder";
-  return { actor, token: provided };
+  return { actor: resolveActor(env.ORCHESTRATOR_APPROVER), token: provided };
 }
+
 
 /** Returns the refusal response, or null when the caller is authenticated. */
 function denied(auth: Principal | Response): Response | null {
@@ -291,8 +267,19 @@ async function decideRun(
     return json(await agent.rejectRun(runId, reason));
   }
 
+  // Fail closed on a missing approver identity.
+  //
+  // Without this, an unset ORCHESTRATOR_APPROVER would let an approval through
+  // with a placeholder actor, producing a release attributed to nobody. Scoped
+  // to approval: rejecting is always safe, and status reads stay available so an
+  // operator can still see why a release is stuck.
+  if (action === "approve") {
+    const refusal = approvalRefusal(principal);
+    if (refusal) return json({ error: refusal }, 503);
+  }
+
   // `principal.actor` overrides anything the body claimed about who is approving.
-  const result = await agent.approveRun(runId, body, principal.actor);
+  const result = await agent.approveRun(runId, body, principal.actor as string);
 
   // A refusal is reported as 422, not 202: the approval was understood and
   // declined, and the caller needs to distinguish that from an accepted one.

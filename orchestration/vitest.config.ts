@@ -27,8 +27,12 @@ export default defineConfig({
             wrangler: { configPath: "./wrangler.test.jsonc" },
             miniflare: {
               bindings: {
-                // A test-only token. Never a real secret.
+                // Test-only values. Never real secrets.
                 ORCHESTRATOR_API_TOKEN: "test-token-do-not-use",
+                // The principal that `approvedBy` is derived from. Without it the
+                // approval path fails closed, which is correct — so it must be
+                // present for the release-path tests to reach the boundary.
+                ORCHESTRATOR_APPROVER: "D. Rodriguez (Program Director)",
               },
             },
           }),

@@ -228,7 +228,6 @@ it("releases once on a verified approval, and is idempotent on repeats", async (
   const final = (await settled.json()) as { status: string };
   expect(final.status).toBe("RELEASED");
 }, 90_000);
-
 it("keeps two concurrent runs isolated", async () => {
   const clean = cleanSubmission({ courseId: "life-cycle-concurrent-clean" });
   const blocked = cleanSubmission({ courseId: "life-cycle-concurrent-held" });
