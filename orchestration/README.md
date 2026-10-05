@@ -256,10 +256,11 @@ Every failure is a refusal, never a fallback:
 An empty `OIDC_APPROVER_ROLES` must mean **nobody**, never everybody. That
 default is asserted in the suite.
 
-### Configuration
+### Provider
 
-All provider-specific values come from configuration, so changing identity
-provider needs no code change:
+**Auth0** is the selected identity provider. The full configuration, the tenant
+checklist, the secrets table and the known failure mode are in
+[`docs/auth0-setup.md`](docs/auth0-setup.md).
 
 ```
 OIDC_ISSUER           https://idp.example/
