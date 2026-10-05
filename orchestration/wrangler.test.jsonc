@@ -1,0 +1,53 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  // TEST-ONLY configuration. Never deployed.
+  //
+  // `@cloudflare/vitest-pool-workers` bundles its own Wrangler (4.124), which
+  // predates the declarative `exports` map and rejects `"type": "workflow"`:
+  //
+  //   "exports.ReleasePipelineWorkflow.type" must be "durable-object" or
+  //   "worker", but got "workflow".
+  //
+  // The deployable wrangler.jsonc uses the modern declarative form, which the
+  // pinned wrangler 4.144 accepts, and the deployment dry-run validates it.
+  // This file restates the same bindings in the older `migrations` syntax so
+  // the workerd-backed integration suite can load them.
+  //
+  // The two files must be kept in step. If a binding is added to wrangler.jsonc,
+  // add it here too, or the integration suite silently tests a Worker that does
+  // not match the one that ships.
+  "name": "village-strong-orchestrator-test",
+  "main": "src/index.ts",
+  // Pinned to the workerd release the test pool actually ships, so the runtime
+  // does not silently fall back to an older compatibility date.
+  "compatibility_date": "2026-08-15",
+  "compatibility_flags": ["nodejs_compat"],
+
+  "durable_objects": {
+    "bindings": [
+      {
+        "name": "OrchestratorAgent",
+        "class_name": "OrchestratorAgent"
+      }
+    ]
+  },
+
+  "workflows": [
+    {
+      "binding": "RELEASE_PIPELINE_WORKFLOW",
+      "class_name": "ReleasePipelineWorkflow",
+      "name": "village-strong-release-pipeline"
+    }
+  ],
+
+  "migrations": [
+    {
+      "tag": "v1",
+      "new_sqlite_classes": ["OrchestratorAgent"]
+    }
+  ],
+
+  "observability": {
+    "enabled": false
+  }
+}

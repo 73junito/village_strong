@@ -96,3 +96,53 @@ jobs:
       # Cloudflare API, so config regressions fail here before any deploy.
       - name: Validate Cloudflare deployment bundle
         run: npm run deploy:check
+
+  orchestrator:
+    name: Orchestration pipeline
+    runs-on: ubuntu-latest
+
+    defaults:
+      run:
+        working-directory: orchestration
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+          cache-dependency-path: orchestration/package-lock.json
+
+      - name: Install dependencies
+        run: npm ci
+
+      # env.d.ts is generated (and gitignored) from wrangler.jsonc, so it must be
+      # rebuilt before typechecking or the Env bindings will not exist at all.
+      - name: Generate runtime types
+        run: npm run cf:types
+
+      # Three configs, three environments: the Workers runtime, the Node unit
+      # tests, and the workerd integration suite. Merging them would merge
+      # conflicting global declarations.
+      - name: Type-check
+        run: npm run typecheck
+
+      - name: Unit tests (ten gates + approval boundary)
+        run: npm run test:unit
+
+      # Boots the Worker on workerd with the Durable Object and Workflow bindings
+      # and exercises the full lifecycle: start, park at AWAITING_APPROVAL,
+      # approve, release once, reject repeats, and keep concurrent runs isolated.
+      - name: Integration tests (workerd)
+        run: npm run test:integration
+
+      # Bundles the Worker and prints the binding table. `--dry-run` writes
+      # nothing to the Cloudflare API, so this job cannot deploy. The repository
+      # also holds no deploy credentials: CLOUDFLARE_API_TOKEN and
+      # CLOUDFLARE_ACCOUNT_ID are intentionally not configured here, and this
+      # job never invokes `wrangler deploy`.
+      - name: Validate Cloudflare deployment bundle
+        run: npm run deploy:dry-run

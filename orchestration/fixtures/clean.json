@@ -1,0 +1,84 @@
+{
+  "courseId": "heroes-path-week-1",
+  "sources": [
+    {
+      "id": "s1",
+      "title": "Mentoring and youth resilience: a meta-analysis",
+      "year": 2023,
+      "peerReviewed": true,
+      "supports": ["o1", "o2", "o3"]
+    }
+  ],
+  "assets": [
+    {
+      "id": "a1",
+      "kind": "image",
+      "title": "Village Strong programme banner",
+      "license": "Owned",
+      "depictsPeople": false,
+      "consentOnFile": false,
+      "original": true
+    },
+    {
+      "id": "a2",
+      "kind": "video",
+      "title": "Mentor welcome, Module 0",
+      "license": "CC BY 4.0",
+      "depictsPeople": true,
+      "consentOnFile": true,
+      "original": false
+    }
+  ],
+  "objectives": [
+    { "id": "o1", "text": "Define emotional regulation in one sentence.", "bloomLevel": "remember" },
+    { "id": "o2", "text": "Explain how unresolved conflict affects a team.", "bloomLevel": "understand" },
+    { "id": "o3", "text": "Apply a de-escalation script during a role play.", "bloomLevel": "apply" }
+  ],
+  "items": [
+    {
+      "id": "o1-i1",
+      "kind": "mcq",
+      "objectiveId": "o1",
+      "points": 1,
+      "optionIds": ["a", "b", "c"],
+      "correctOptionIds": ["b"],
+      "rationale": "Regulation is pausing before reacting, which option b states."
+    },
+    {
+      "id": "o1-i2",
+      "kind": "mcq",
+      "objectiveId": "o1",
+      "points": 1,
+      "optionIds": ["a", "b", "c"],
+      "correctOptionIds": ["a"],
+      "rationale": "Naming the feeling is the first step of the pause."
+    },
+    {
+      "id": "o2-i1",
+      "kind": "mcq",
+      "objectiveId": "o2",
+      "points": 1,
+      "optionIds": ["a", "b", "c"],
+      "correctOptionIds": ["c"],
+      "rationale": "Unresolved conflict costs the team trust and focus."
+    },
+    {
+      "id": "o2-i2",
+      "kind": "msq",
+      "objectiveId": "o2",
+      "points": 1,
+      "optionIds": ["a", "b", "c"],
+      "correctOptionIds": ["a", "b"],
+      "rationale": "Trust and focus both erode; attendance is unrelated."
+    },
+    {
+      "id": "o3-i1",
+      "kind": "constructed",
+      "objectiveId": "o3",
+      "points": 1,
+      "rubric": "Names the situation, the feeling, and a next step within 24 hours."
+    }
+  ],
+  "priorReviewNotes": ["Reviewed in the week-0 curriculum council on 2026-09-28."],
+  "stageArtifacts": {}
+}

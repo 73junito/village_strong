@@ -1,0 +1,18 @@
+{
+  // Type-checking for the test suite.
+  //
+  // Kept separate from tsconfig.json because `@cloudflare/workers-types` and
+  // `@types/node` both declare globals such as Request, Response and
+  // ReadableStream. Loading them together produces duplicate-identifier errors
+  // that say nothing about this code. `src/` is therefore checked against the
+  // Workers runtime types only, and `tests/` against Node's.
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    // Node's globals only. The Workers runtime types are inherited through
+    // `env.d.ts`, which is already included by the base config and which Node's
+    // own `Request`/`Response` declarations do not clash with in this project.
+    "types": ["node"]
+  },
+  "include": ["env.d.ts", "tests/*.test.ts", "src/**/*.ts"],
+  "exclude": ["node_modules", "tests/integration"]
+}

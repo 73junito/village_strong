@@ -1,0 +1,14 @@
+{
+  // Type-checking for the workerd integration suite.
+  //
+  // Separate again because these tests import `cloudflare:test` and Vitest,
+  // neither of which exists in Node's type space, and because `tests/*.test.ts`
+  // re-export helpers the integration suite borrows.
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "types": ["@cloudflare/vitest-pool-workers/types"],
+    "noUnusedLocals": false
+  },
+  "include": ["env.d.ts", "vitest.config.ts", "tests/integration/**/*.ts", "src/**/*.ts"],
+  "exclude": ["node_modules"]
+}

@@ -1,0 +1,17 @@
+# Build output
+dist/
+.wrangler/
+
+# Dependencies
+node_modules/
+
+# Wrangler state and local secrets
+.dev.vars
+.dev.vars.*
+!.dev.vars.example
+
+# Generated runtime types (~600 KB). Produced by `npm run cf:types` from
+# wrangler.jsonc, and regenerated in CI before every typecheck. Committing it
+# would mean a stale copy silently contradicting the real bindings, which is the
+# exact class of drift this file exists to prevent.
+env.d.ts
