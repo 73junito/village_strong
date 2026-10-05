@@ -385,5 +385,8 @@ so a regression cannot come back silently.
 - **The gates are deterministic rules, not LLM calls.** Each agent is a pure
   function, so an LLM-backed implementation can be substituted per stage without
   changing the workflow.
-- **Not deployed.** The bundle is validated with `wrangler deploy --dry-run`
-  only; no Worker named `village-strong-orchestrator` has been created.
+- **Not deployed.** The bundle is validated with `npm run check:private-config`
+  (`wrangler deploy --config wrangler.jsonc --dry-run`) only; no Worker named
+  `village-strong-orchestrator` has been created. There is deliberately no
+  unqualified `npm run deploy` — any such command resolves to the base config
+  and would create the production-named Worker.

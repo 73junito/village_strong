@@ -143,6 +143,10 @@ jobs:
       # nothing to the Cloudflare API, so this job cannot deploy. The repository
       # also holds no deploy credentials: CLOUDFLARE_API_TOKEN and
       # CLOUDFLARE_ACCOUNT_ID are intentionally not configured here, and this
-      # job never invokes `wrangler deploy`.
+      # job never invokes `wrangler deploy` for real.
+      #
+      # The command names the config explicitly. The former `deploy:dry-run`
+      # resolved to wrangler.jsonc by default, which reads as a deploy step in
+      # the workflow and invites a reader to "simplify" it into an actual one.
       - name: Validate Cloudflare deployment bundle
-        run: npm run deploy:dry-run
+        run: npm run check:private-config

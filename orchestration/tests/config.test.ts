@@ -148,6 +148,9 @@ test("CI invokes check:private-config and no ambiguous deploy command", () => {
 
 test("no CI step deploys for real", () => {
   for (const line of readCI().split("\n")) {
+    // Comments legitimately mention `wrangler deploy` while explaining why CI
+    // never runs it; only an actual command can write to the API.
+    if (line.trimStart().startsWith("#")) continue;
     if (line.includes("wrangler deploy") && !line.includes("--dry-run")) {
       assert.fail(`CI step writes to the Cloudflare API: ${line.trim()}`);
     }
