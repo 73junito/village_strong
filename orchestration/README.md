@@ -220,6 +220,64 @@ a parameter, and the workflow passes `event.timestamp`. Replaying a durable step
 therefore cannot rewrite an artifact an earlier step already committed — a real
 risk here, because step outputs share the `Submission` that later gates read.
 
+## Approval identity (OIDC, per person)
+
+Approvals are authenticated with **OIDC**, not a shared secret. All verification
+is delegated to [`jose`](https://github.com/panva/jose) — JWKS resolution, key
+selection by `kid`/`alg`/`use`/`key_ops`, signature, issuer, audience and expiry.
+None of that is hand-rolled here, because that surface is where auth bugs live.
+
+| Requirement | Where |
+|---|---|
+| Signature, issuer, audience, expiry | `verifyApprovalIdentity` via `jose.jwtVerify` |
+| Algorithm pinning | `PERMITTED_ALGS` — asymmetric only; never `none`, never HS* |
+| Key rotation | `createRemoteJWKSet` caches and refetches on an unknown `kid` |
+| `approvedBy` | `<issuer>#<subject>` — registered claims only |
+| Display data | `displayName` / `email`, carried separately, never the actor |
+| Role enforcement | `OIDC_ROLE_CLAIM` ∩ `OIDC_APPROVER_ROLES`, checked *after* auth |
+| Replay | `nonce` must equal the run-bound approval nonce |
+| Audit | issuer, subject, `authenticatedAt`, run id, reviewed hash, reason |
+
+**The actor is never an email or a name.** Both are display data an issuer may
+let a user edit; only `iss` + `sub` identify a person. That is why
+`approvedBy` reads `https://idp.example/#user-123` and not `dana@example.org`.
+
+Every failure is a refusal, never a fallback:
+
+| Condition | Outcome |
+|---|---|
+| Any OIDC setting missing | `CONFIG_MISSING` — including an **empty allowlist** |
+| Expired token | `EXPIRED` |
+| Wrong issuer or audience | `TOKEN_INVALID` |
+| Bad signature, forged token, unknown `kid` | `SIGNATURE_INVALID` |
+| No approver role | `ROLE_MISSING` |
+| Nonce from another run, or absent | `NONCE_MISMATCH` |
+
+An empty `OIDC_APPROVER_ROLES` must mean **nobody**, never everybody. That
+default is asserted in the suite.
+
+### Configuration
+
+All provider-specific values come from configuration, so changing identity
+provider needs no code change:
+
+```
+OIDC_ISSUER           https://idp.example/
+OIDC_AUDIENCE         village-strong-orchestrator
+OIDC_JWKS_URL         https://idp.example/.well-known/jwks.json
+OIDC_ROLE_CLAIM       roles
+OIDC_APPROVER_ROLES   release-approver,curriculum-chair
+```
+
+### Testing
+
+`tests/oidc.test.ts` generates a real RSA keypair in-process and publishes a real
+JWKS, then exercises the same `jwtVerify` path production uses. **CI never
+contacts an identity provider.** Negative cases cover expiry, wrong issuer,
+wrong audience, forged signature, unknown `kid`, missing role, missing role
+claim, cross-run nonce replay, absent nonce, malformed tokens, and every missing
+configuration key.
+
 ## The deadlock this design avoids
 
 A Durable Object handles one request at a time, and the workflow reports back

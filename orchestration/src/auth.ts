@@ -8,18 +8,22 @@
  * into every other test in the file and made the suite order-dependent.
  */
 
+import type { VerifiedIdentity } from "./oidc.ts";
+
 /** The authenticated caller. */
 export interface Principal {
   /**
-   * The accountable identity written into `approvedBy`, or null when the
-   * server has no configured approver.
+   * The accountable identity written into `approvedBy`, or null when there is
+   * no verified identity to attribute the release to.
    *
-   * Null is meaningful: it means there is nobody to attribute a release to, and
-   * the approval path must refuse rather than invent a placeholder.
+   * Null is meaningful: it means nobody can be held accountable, and the
+   * approval path must refuse rather than invent a placeholder.
    */
   actor: string | null;
-  /** The raw token, kept so a non-identity failure reason can be returned. */
+  /** The raw token. Never persisted; an audit record keeps claims, not this. */
   token: string;
+  /** Present only when the caller authenticated with a verified OIDC token. */
+  identity?: VerifiedIdentity;
 }
 
 /**
