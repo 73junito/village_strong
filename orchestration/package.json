@@ -1,0 +1,32 @@
+{
+  "name": "village-strong-orchestrator",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "engines": {
+    "node": ">=22.13.0"
+  },
+  "scripts": {
+    "dev": "wrangler dev",
+    "deploy": "wrangler deploy",
+    "deploy:dry-run": "wrangler deploy --dry-run",
+    "cf:types": "wrangler types env.d.ts",
+    "review": "node scripts/review.ts",
+    "typecheck": "tsc --noEmit && tsc --noEmit -p tsconfig.test.json && tsc --noEmit -p tsconfig.integration.json",
+    "test": "npm run test:unit && npm run test:integration",
+    "test:unit": "node --test tests/*.test.ts",
+    "test:integration": "vitest run",
+    "check": "npm run cf:types && npm run typecheck && npm test"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/client": "^2.0.0",
+    "agents": "0.26.0"
+  },
+  "devDependencies": {
+    "@cloudflare/vitest-pool-workers": "0.22.0",
+    "@types/node": "^22.19.19",
+    "typescript": "5.9.3",
+    "vitest": "^4.1.0",
+    "wrangler": "4.144.0"
+  }
+}

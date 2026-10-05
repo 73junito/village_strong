@@ -1,0 +1,50 @@
+{
+  "courseId": "heroes-path-week-2",
+  "sources": [
+    {
+      "id": "s1",
+      "title": "Mentoring and youth resilience: a meta-analysis",
+      "year": 2023,
+      "peerReviewed": true,
+      "supports": ["o1", "o2"]
+    }
+  ],
+  "assets": [
+    {
+      "id": "a1",
+      "kind": "image",
+      "title": "Programme banner",
+      "license": "Owned",
+      "depictsPeople": false,
+      "consentOnFile": false,
+      "original": true
+    },
+    {
+      "id": "a2",
+      "kind": "video",
+      "title": "Mentor interview, Module 2",
+      "license": "",
+      "depictsPeople": true,
+      "consentOnFile": false,
+      "original": false
+    }
+  ],
+  "objectives": [
+    { "id": "o1", "text": "Define emotional regulation in one sentence.", "bloomLevel": "remember" },
+    { "id": "o2", "text": "Explain how unresolved conflict affects a team.", "bloomLevel": "understand" },
+    { "id": "o3", "text": "Compare two mentoring responses to a disclosure.", "bloomLevel": "analyze" }
+  ],
+  "items": [
+    {
+      "id": "o1-i1",
+      "kind": "mcq",
+      "objectiveId": "o1",
+      "points": 1,
+      "optionIds": ["a", "b", "c"],
+      "correctOptionIds": ["b"],
+      "rationale": "Regulation is pausing before reacting."
+    }
+  ],
+  "priorReviewNotes": [],
+  "stageArtifacts": {}
+}

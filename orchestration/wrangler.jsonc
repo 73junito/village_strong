@@ -1,0 +1,68 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  // Deliberately NOT `village-strong`: that Worker owns the production custom
+  // domains villagestrongfoundation.org and www. The orchestration layer is a
+  // separate deployable so it can never interfere with the live site, and so a
+  // failed release decision here cannot take the website down with it.
+  "name": "village-strong-orchestrator",
+  "main": "src/index.ts",
+  "compatibility_date": "2026-10-05",
+  // Required by the Agents SDK for crypto, streams and other Node APIs.
+  "compatibility_flags": ["nodejs_compat"],
+
+  // No public surface. `workers_dev: false` removes the *.workers.dev subdomain,
+  // which would otherwise make this an unauthenticated internet endpoint for an
+  // API that can release content.
+  "workers_dev": false,
+
+  // No `routes` and no `custom_domain`, on purpose. This Worker must never be
+  // attached to villagestrongfoundation.org, to www, or to any public hostname.
+  // It shares no domains, data, identity, secrets, Durable Object namespaces or
+  // admin interfaces with `village-strong`.
+  //
+  // Reach it with `wrangler dev` locally, an authenticated operator using
+  // `wrangler deployments`, or a private service binding once one is
+  // provisioned. Provisioning a staging hostname is a deployment decision and
+  // is listed in README.md under Limitations.
+
+  "observability": {
+    "enabled": true
+  },
+
+  // The Agent is a Durable Object; `exports` provisions its SQLite storage. The
+  // Workflow is declared in `exports` too, and is bound into the Agent through
+  // the `workflows` array so `runWorkflow` can reach it.
+  "durable_objects": {
+    "bindings": [
+      {
+        "name": "OrchestratorAgent",
+        "class_name": "OrchestratorAgent"
+      }
+    ]
+  },
+
+  "workflows": [
+    {
+      "binding": "RELEASE_PIPELINE_WORKFLOW",
+      "class_name": "ReleasePipelineWorkflow",
+      "name": "village-strong-release-pipeline"
+    }
+  ],
+
+  // Declarative export map. `storage` is required for Durable Objects; `name` is
+  // the Workflow's stable identity used for instance and storage namespacing,
+  // and must not change once instances exist, because renaming it orphans them.
+  "exports": {
+    "OrchestratorAgent": {
+      "type": "durable-object",
+      "storage": "sqlite"
+    },
+    "ReleasePipelineWorkflow": {
+      "type": "workflow",
+      "name": "village-strong-release-pipeline"
+    }
+  },
+
+  // No `account_id`: local runs authenticate via `wrangler login` and CI supplies
+  // CLOUDFLARE_ACCOUNT_ID. This mirrors apps/web/wrangler.jsonc.
+}
