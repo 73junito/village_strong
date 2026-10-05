@@ -278,6 +278,62 @@ wrong audience, forged signature, unknown `kid`, missing role, missing role
 claim, cross-run nonce replay, absent nonce, malformed tokens, and every missing
 configuration key.
 
+## Approval sessions (run-bound nonce, state, PKCE)
+
+> **Status: primitives and durable ledger only.** There is deliberately **no**
+> authorization URL, callback route, token exchange, client secret or redirect
+> URI here. Those arrive with the real identity provider. This layer is the part
+> that must never be wrong, so it is built and tested in isolation rather than
+> against a fictional provider contract.
+
+A session is the durable state one approval attempt needs:
+
+| Value | Stored as | Why |
+|---|---|---|
+| OIDC `nonce` | SHA-256 hash | Must be unguessable to stop replay |
+| OAuth `state` | SHA-256 hash | Must be unguessable to stop response injection |
+| PKCE verifier | **plaintext** | The token exchange must send it verbatim |
+| PKCE challenge | plaintext | `BASE64URL(SHA256(verifier))`, travels to the IdP |
+| `createdAt` / `expiresAt` | plaintext | 10-minute TTL |
+| `consumedAt` | plaintext, write-once | One-time use |
+
+Only hashes of `nonce` and `state` are stored, so a ledger read cannot
+reconstruct either secret. The PKCE verifier is stored in the clear **by
+design** — hashing it would break the exchange; its protection is that it exists
+only in this run's ledger.
+
+### Rules enforced
+
+- **Created only for `AWAITING_APPROVAL`.** A `HELD` run gets no nonce, and
+  neither does a running or already-released one.
+- **One nonce, one run, one use.** A session is bound to `runId`; re-minting
+  replaces the previous session rather than leaving two live nonces.
+- **A failed attempt does not consume.** Wrong `state` or a foreign nonce leaves
+  the session spendable, so a reviewer can correct the flow and retry.
+- **Consumption is atomic and write-once.** Two concurrent callbacks serialise on
+  the Durable Object, so the loser observes `consumedAt` already set. `consumedAt`
+  is never rewritten or cleared.
+- **Cross-run replay fails.** A nonce legitimately issued for run A does not
+  verify against run B.
+
+### Two independent controls
+
+The session and the reviewed-artifact hash are **not** redundant:
+
+- The **nonce** stops an authenticated approval being replayed — it authorises
+  the *act*.
+- The **artifact hash** proves *what* the person approved — it covers the content.
+
+Either alone is insufficient: without the hash a valid nonce could approve a
+changed submission; without the nonce an approval could be reused.
+
+### Deadlock safety
+
+Session creation and consumption are **Worker → Durable Object** RPCs, not
+**Workflow → Durable Object** callbacks. The re-entrancy cycle that bit us
+earlier only occurs when a workflow calls back into an object whose own request
+is still open, so this layer cannot reintroduce it.
+
 ## The deadlock this design avoids
 
 A Durable Object handles one request at a time, and the workflow reports back
