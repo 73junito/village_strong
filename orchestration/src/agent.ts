@@ -9,6 +9,16 @@
  */
 import { Agent } from "agents";
 
+import {
+  checkApprovalSession,
+  consumeSession,
+  createApprovalSession,
+  verifyNonce,
+  verifyState,
+  type ApprovalSession,
+  type IssuedApprovalSession,
+  type SessionRejection,
+} from "./approval-session.ts";
 import { parseApproval } from "./approval.ts";
 import { PIPELINE } from "./pipeline.ts";
 import type { PendingApproval, ReleaseDecision, ApprovalRejection } from "./types.ts";
@@ -34,6 +44,13 @@ export interface RunRecord {
   /** Why it was held, carried over from the workflow's completion callback. */
   message?: string;
   pendingApproval: PendingApproval | null;
+  /**
+   * The live approval session, if one has been started.
+   *
+   * Only hashes of the nonce and `state` are stored. The session is bound to
+   * this run id, so a value minted for one run cannot be spent on another.
+   */
+  approvalSession?: ApprovalSession | null;
 }
 
 /** The state mirrored to every connected client. */
@@ -152,6 +169,118 @@ export class OrchestratorAgent extends Agent<Env, OrchestratorState> {
       ...this.state,
       runs: { ...runs, [runId]: { ...existing, ...patch } },
     });
+  }
+
+  /**
+   * Creates a run-bound approval session.
+   *
+   * Refused for any run that is not parked at the approval boundary. A session
+   * for a `HELD` run would be a nonce nobody can legitimately spend; one for a
+   * still-running run would be minted before there is anything to approve.
+   *
+   * Replaces any previous session, so a restarted attempt invalidates whatever
+   * was in flight instead of leaving two live nonces for one run.
+   */
+  async beginApprovalSession(
+    runId: string,
+    now: number,
+  ): Promise<{ started: boolean; reason?: string; issued?: IssuedApprovalSession; expiresAt?: number }> {
+    const run = this.getLedgerRun(runId);
+    if (!run) return { started: false, reason: "Unknown run." };
+    if (run.status !== "AWAITING_APPROVAL") {
+      return {
+        started: false,
+        reason: `Run ${runId} is "${run.status}", not awaiting approval.`,
+      };
+    }
+
+    const { session, issued } = await createApprovalSession(runId, now);
+
+    await this.patchRun(runId, { approvalSession: session });
+
+    return { started: true, issued, expiresAt: session.expiresAt };
+  }
+
+  /**
+   * Validates an approval attempt against the stored session, WITHOUT consuming.
+   *
+   * A failed attempt must leave the session spendable so a reviewer can correct
+   * a mistake and retry. Only `consumeApprovalSession` is one-way.
+   */
+  async checkApprovalSessionFor(
+    runId: string,
+    presentedState: string,
+    now: number,
+  ): Promise<{ ok: boolean; reason?: SessionRejection; message?: string; pkceChallenge?: string }> {
+    const run = this.getLedgerRun(runId);
+    const check = checkApprovalSession(run?.approvalSession, presentedState, now);
+    if (!check.ok) return { ok: false, reason: check.reason, message: check.message };
+
+    const stateMatches = await verifyState(check.session, presentedState);
+    if (!stateMatches) {
+      return {
+        ok: false,
+        reason: "STATE_MISMATCH",
+        message: "The returned `state` does not match this run's approval session.",
+      };
+    }
+
+    return { ok: true, pkceChallenge: check.session.pkceChallenge };
+  }
+
+  /**
+   * Confirms a returned nonce belongs to this run's session.
+   *
+   * This is what stops cross-run replay: a token minted for run A fails here
+   * when offered to run B, even though it is otherwise a valid token.
+   */
+  async checkApprovalNonce(
+    runId: string,
+    presentedNonce: string,
+  ): Promise<{ ok: boolean; reason?: SessionRejection; message?: string }> {
+    const run = this.getLedgerRun(runId);
+    const session = run?.approvalSession;
+
+    const check = checkApprovalSession(session, "", Date.now());
+    if (!check.ok) return { ok: false, reason: check.reason, message: check.message };
+
+    const matches = await verifyNonce(check.session, presentedNonce);
+    if (!matches) {
+      return {
+        ok: false,
+        reason: "NONCE_MISMATCH",
+        message: "The returned nonce does not belong to this run.",
+      };
+    }
+
+    return { ok: true };
+  }
+
+  /**
+   * Atomically consumes the session.
+   *
+   * Atomicity comes from the Durable Object runtime, not from a lock here: a DO
+   * serves one request at a time, so two concurrent callbacks are serialised
+   * and the second observes `consumedAt` already set. Read-decide-write inside
+   * this single handler is therefore indivisible with respect to other requests.
+   *
+   * Returns `consumed: false` for the loser of a race, and that is the only
+   * path by which two approvals can be prevented from releasing twice.
+   */
+  async consumeApprovalSession(
+    runId: string,
+    now: number,
+  ): Promise<{ consumed: boolean; reason?: SessionRejection; message?: string }> {
+    const run = this.getLedgerRun(runId);
+
+    const check = checkApprovalSession(run?.approvalSession, "", now);
+    if (!check.ok) return { consumed: false, reason: check.reason, message: check.message };
+
+    // One-way. A failed authentication must not reach here, so a retry is
+    // still possible; a successful one leaves the session permanently spent.
+    await this.patchRun(runId, { approvalSession: consumeSession(check.session, now) });
+
+    return { consumed: true };
   }
 
   /** Recent runs, newest first. */

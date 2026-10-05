@@ -165,6 +165,56 @@ export default {
       return decideRun(request, env, principal, runMatch[1]!, runMatch[2] as "approve" | "reject");
     }
 
+    // Approval-session plumbing only. There is deliberately NO authorization URL,
+    // callback route, token exchange or provider coupling here: those arrive with
+    // the real identity provider. What lives here is the run-bound nonce/state/
+    // PKCE ledger, which is the part that must never be wrong.
+    const sessionMatch = url.pathname.match(/^\/api\/runs\/([^/]+)\/(session|approve-session)$/);
+    if (sessionMatch && request.method === "POST") {
+      const runId = sessionMatch[1]!;
+      const isConsume = sessionMatch[2] === "approve-session";
+
+      const agent = await orchestrator(env);
+      const now = Date.now();
+
+      if (!isConsume) {
+        const started = await agent.beginApprovalSession(runId, now);
+        if (!started.started) {
+          return json({ error: started.reason }, started.reason === "Unknown run." ? 404 : 422);
+        }
+        return json(started.issued, 200);
+      }
+
+      let body: { state?: unknown; nonce?: unknown; consume?: unknown; now?: unknown };
+      try {
+        body = (await request.json()) as typeof body;
+      } catch {
+        return json({ error: "Expected a JSON body." }, 400);
+      }
+
+      // `now` is injectable so expiry is testable without waiting out the TTL.
+      const at = typeof body.now === "number" ? body.now : now;
+      const state = typeof body.state === "string" ? body.state : "";
+      const nonce = typeof body.nonce === "string" ? body.nonce : "";
+
+      const stateCheck = await agent.checkApprovalSessionFor(runId, state, at);
+      if (!stateCheck.ok) return json({ error: stateCheck.message, reason: stateCheck.reason }, 422);
+
+      const nonceCheck = await agent.checkApprovalNonce(runId, nonce);
+      if (!nonceCheck.ok) return json({ error: nonceCheck.message, reason: nonceCheck.reason }, 422);
+
+      // Consumption only happens once every check has passed, so a failed
+      // attempt never burns the session.
+      if (body.consume === true) {
+        const consumed = await agent.consumeApprovalSession(runId, at);
+        if (!consumed.consumed) {
+          return json({ error: consumed.message, reason: consumed.reason }, 422);
+        }
+      }
+
+      return json({ ok: true, pkceChallenge: stateCheck.pkceChallenge }, 200);
+    }
+
     const getMatch = url.pathname.match(/^\/api\/runs\/([^/]+)$/);
     if (getMatch && request.method === "GET") {
       // `noUncheckedIndexedAccess` makes the capture optional; the regex only
