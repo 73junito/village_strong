@@ -8,8 +8,7 @@
   },
   "scripts": {
     "dev": "wrangler dev",
-    "deploy": "wrangler deploy",
-    "deploy:dry-run": "wrangler deploy --dry-run",
+    "check:private-config": "wrangler deploy --config wrangler.jsonc --dry-run",
     "cf:types": "wrangler types env.d.ts",
     "review": "node scripts/review.ts",
     "typecheck": "tsc --noEmit && tsc --noEmit -p tsconfig.test.json && tsc --noEmit -p tsconfig.integration.json",
