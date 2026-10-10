@@ -1,10 +1,10 @@
 import type { Metadata } from "next";
 import "./globals.css";
-import "./catalog.css";
 
 export const metadata: Metadata = {
   title: "Village Strong | FAMILY Foundation",
-  description: "Noncredit education in human and child development, fatherhood science, and parent education.",
+  description:
+    "Village Strong Foundation is developing family support, fatherhood engagement and education, and fatherhood research initiatives.",
   other: { "codex-preview": "development" },
 };
 
