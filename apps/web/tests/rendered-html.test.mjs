@@ -64,7 +64,8 @@ test("FAMILY separates participant and facilitator pathways without credential c
 
 test("Village Strong presents planned focus areas without a public course catalog", async () => {
   const html = await render("/village-strong");
-  assert.match(html, /Building a Stronger Village/i);\n  assert.match(html, /for Children and Families/i);
+  assert.match(html, /Building a Stronger Village/i);
+  assert.match(html, /for Children and Families/i);
   assert.match(html, /Planned areas of focus/i);
   assert.match(html, /No formal program enrollment/i);
   assert.doesNotMatch(html, /96 instructional hours/i);
