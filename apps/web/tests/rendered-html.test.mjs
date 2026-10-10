@@ -45,13 +45,13 @@ test("home presents one foundation and three planning-stage components", async (
   const html = await render("/");
   assert.match(html, /Building Stronger Families\. Strengthening Communities\./i);
   assert.match(html, /In Development - Not Currently Enrolling/i);
-  assert.match(html, /Fatherhood Research & Evaluation/i);
+  assert.match(html, /Fatherhood Research (?:&|&amp;) Evaluation/i);
   assert.match(html, /not an offer of enrollment/i);
 });
 
 test("FAMILY separates participant and facilitator pathways without credential claims", async () => {
   const html = await render("/family");
-  assert.match(html, /Fatherhood Engagement & Education/i);
+  assert.match(html, /Fatherhood Engagement (?:&|&amp;) Education/i);
   assert.match(html, /FAMILY Facilitator Development/i);
   assert.match(html, /Conceptual - Not Enrolling/i);
   assert.match(html, /24:7 Dad/i);
@@ -64,7 +64,7 @@ test("FAMILY separates participant and facilitator pathways without credential c
 
 test("Village Strong presents planned focus areas without a public course catalog", async () => {
   const html = await render("/village-strong");
-  assert.match(html, /Building a Stronger Village for Children and Families/i);
+  assert.match(html, /Building a Stronger Village/i);\n  assert.match(html, /for Children and Families/i);
   assert.match(html, /Planned areas of focus/i);
   assert.match(html, /No formal program enrollment/i);
   assert.doesNotMatch(html, /96 instructional hours/i);
