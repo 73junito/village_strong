@@ -2,10 +2,6 @@ import assert from "node:assert/strict";
 import test from "node:test";
 
 const developmentPreviewMeta = /<meta(?=[^>]*\bname=["']codex-preview["'])(?=[^>]*\bcontent=["']development["'])[^>]*>/i;
-const catalogHref = "/course-catalog/Village_Strong_FAMILY_Course_Catalog_2026_2027.docx";
-
-// Mirrors verify-deploy.ps1's Get-AppTitleNote: acceptance is the application
-// title in the body, never a bare 200.
 const appTitle = /Village Strong\s*\|\s*FAMILY Foundation/i;
 const canonicalBase = "https://villagestrongfoundation.org";
 
@@ -45,20 +41,47 @@ test("renders development preview metadata", async () => {
   assert.match(await render("/"), developmentPreviewMeta);
 });
 
-test("renders FAMILY classification and catalog download", async () => {
-  const html = await render("/family");
-  assert.match(html, /Fatherhood Science/i);
-  assert.match(html, /CIP 19\.0712/);
-  assert.match(html, /96 instructional hours/i);
-  assert.ok(html.includes(catalogHref));
+test("home presents one foundation and three planning-stage components", async () => {
+  const html = await render("/");
+  assert.match(html, /Building Stronger Families\. Strengthening Communities\./i);
+  assert.match(html, /In Development - Not Currently Enrolling/i);
+  assert.match(html, /Fatherhood Research (?:&|&amp;) Evaluation/i);
+  assert.match(html, /not an offer of enrollment/i);
 });
 
-test("renders Village Strong classification and catalog download", async () => {
+test("FAMILY separates participant and facilitator pathways without credential claims", async () => {
+  const html = await render("/family");
+  assert.match(html, /Fatherhood Engagement (?:&|&amp;) Education/i);
+  assert.match(html, /FAMILY Facilitator Development/i);
+  assert.match(html, /Conceptual - Not Enrolling/i);
+  assert.match(html, /24:7 Dad/i);
+  assert.match(html, /subject to applicable permissions/i);
+  assert.doesNotMatch(html, /96 instructional hours/i);
+  assert.doesNotMatch(html, /CIP 19\.0712/i);
+  assert.doesNotMatch(html, /Download the complete Word catalog/i);
+  assert.doesNotMatch(html, /Fathers empowered/i);
+});
+
+test("Village Strong presents planned focus areas without a public course catalog", async () => {
   const html = await render("/village-strong");
-  assert.match(html, /Human and child development/i);
-  assert.match(html, /CIP 19\.0701/);
-  assert.match(html, /birth through age 18/i);
-  assert.ok(html.includes(catalogHref));
+  assert.match(html, /Building a Stronger Village/i);
+  assert.match(html, /for Children and Families/i);
+  assert.match(html, /Planned areas of focus/i);
+  assert.match(html, /No formal program enrollment/i);
+  assert.doesNotMatch(html, /96 instructional hours/i);
+  assert.doesNotMatch(html, /CIP 19\.0701/i);
+  assert.doesNotMatch(html, /Download the complete Word catalog/i);
+  assert.doesNotMatch(html, /shared support plan/i);
+});
+
+test("research page identifies concepts as developmental and not validated", async () => {
+  const html = await render("/research");
+  assert.match(html, /Advancing Understanding of Fatherhood/i);
+  assert.match(html, /FRI/);
+  assert.match(html, /EFAS/);
+  assert.match(html, /PPARS/);
+  assert.match(html, /not diagnostic or clinical instruments/i);
+  assert.match(html, /appropriate protocol/i);
 });
 
 test("serves a sitemap listing exactly the canonical public routes", async () => {
@@ -74,12 +97,10 @@ test("serves a sitemap listing exactly the canonical public routes", async () =>
     `${canonicalBase}/`,
     `${canonicalBase}/family`,
     `${canonicalBase}/village-strong`,
+    `${canonicalBase}/research`,
   ]);
 });
 
-// A sitemap is only trustworthy if every URL it advertises actually renders, so
-// the sitemap's own output is driven back through the worker. This cannot pass
-// while the sitemap lists a route the app does not serve, or lists www.
 test("every sitemap URL renders the verified application", async () => {
   const locations = await sitemapLocations();
   assert.ok(locations.length > 0, "the sitemap must advertise at least one URL");
@@ -92,12 +113,6 @@ test("every sitemap URL renders the verified application", async () => {
   }
 });
 
-// T-H4 repair (2026-09-30): the app is the authoritative source of the whole file.
-// Cloudflare's documented prepend did NOT happen in production - the managed
-// notice disappeared the moment this route answered 200 - so the reservation of
-// rights and the Sitemap reference must both come from here, exactly once each.
-// A second copy is not harmless either: it is the signature of the edge starting
-// to prepend again, which is what verify-deploy.ps1 also refuses.
 function countMatches(text, pattern) {
   return [...text.matchAll(pattern)].length;
 }
@@ -113,16 +128,10 @@ test("serves robots.txt with the Article 4 reservation and the sitemap", async (
   assert.match(text, /^Allow: \/$/m);
   assert.match(text, /^Disallow: \/_vinext\/$/m);
   assert.match(text, /^Sitemap: https:\/\/villagestrongfoundation\.org\/sitemap\.xml$/m);
-
-  // The notice leads the file and carries the reservation verbatim.
   assert.match(text, /^# As a condition of accessing this website, you agree to abide by the$/m);
   assert.match(text, /^# RIGHTS UNDER ARTICLE 4 OF THE EUROPEAN UNION DIRECTIVE 2019\/790 ON COPYRIGHT$/m);
 
-  assert.equal(
-    countMatches(text, /EUROPEAN UNION DIRECTIVE 2019\/790/gi),
-    1,
-    "the Article 4 reservation of rights must appear exactly once",
-  );
-  assert.equal(countMatches(text, /^Sitemap:/gim), 1, "exactly one Sitemap reference");
-  assert.equal(countMatches(text, /^User-Agent:/gim), 1, "exactly one User-Agent group");
+  assert.equal(countMatches(text, /EUROPEAN UNION DIRECTIVE 2019\/790/gi), 1);
+  assert.equal(countMatches(text, /^Sitemap:/gim), 1);
+  assert.equal(countMatches(text, /^User-Agent:/gim), 1);
 });

@@ -43,3 +43,55 @@ a{color:inherit;text-decoration:none}
 @media(max-width:1050px){.gateway-card{grid-template-columns:130px 1fr}.vs nav,.family nav{display:none}.vs-hero{grid-template-columns:1fr}.vs-hero-copy{position:relative;z-index:2}.vs-hero-art{min-height:420px}.family-program{grid-template-columns:1fr}.family-program-grid{grid-template-columns:repeat(3,1fr)}.family-impact{grid-template-columns:1fr 2fr}.family-impact blockquote{grid-column:1/-1}.family-give{grid-template-columns:1fr}.family-footer{grid-template-columns:1fr 1fr}.vs-network{grid-template-columns:1fr}.vs-impact{grid-template-columns:repeat(3,1fr)}.vs-impact blockquote{grid-column:1/-1}}
 @media(max-width:760px){.gateway{padding-bottom:30px}.gateway-intro{padding-top:45px}.gateway-grid{grid-template-columns:1fr}.gateway-card{grid-template-columns:100px 1fr;padding:22px}.gateway-logo-wrap{height:150px}.family-monogram{width:95px;height:135px;font-size:66px}.gateway-card h2{font-size:29px}.vs-header,.family-header{height:72px}.vs-brand img{width:50px;height:50px}.vs-brand small{display:none}.vs-hero{padding:60px 24px}.vs-hero-copy h1{font-size:53px}.vs-hero-art{min-height:360px}.vs-hero-art:before{width:340px;height:340px}.vs-hero-art img{height:350px}.float-card{display:none}.section-heading{grid-template-columns:1fr;gap:12px}.pillar-grid{grid-template-columns:1fr}.orbit{width:330px}.vs-impact{grid-template-columns:1fr}.vs-impact blockquote{grid-column:auto}.vs-cta>div{grid-template-columns:1fr}.vs-footer{flex-direction:column;text-align:center}.family-brand{min-width:auto}.family-hero{min-height:650px;align-items:flex-end}.family-shade{background:linear-gradient(0deg,#041a2cfa 0%,#06253ddc 58%,#06253d15 100%)}.family-hero-copy{width:auto;margin:0;padding:230px 24px 55px}.family-hero-copy h1{font-size:44px}.family-program-grid{grid-template-columns:repeat(2,1fr)}.family-impact{grid-template-columns:1fr}.family-stats{grid-template-columns:1fr}.family-give>div:last-child{grid-template-columns:repeat(2,1fr)}.family-footer{grid-template-columns:1fr}}
 @media(max-width:480px){.gateway-header .gateway-kicker{max-width:190px}.gateway-card{grid-template-columns:1fr}.gateway-logo-wrap{height:180px}.family-monogram{width:100%;height:110px;border-radius:16px}.vs-brand b{font-size:18px}.vs-button.compact,.family-button.compact{padding:0 13px}.vs-hero-copy h1{font-size:45px}.vs-actions{flex-direction:column}.vs-hero-art{min-height:300px}.vs-hero-art img{height:300px}.orbit{width:260px}.orbit-item{font-size:8px}.orbit-2{right:-20px}.orbit-4{left:-25px}.family-brand small{display:none}.family-hero-copy h1{font-size:38px}.family-program-grid{grid-template-columns:1fr}.family-give>div:last-child{grid-template-columns:1fr}}
+
+
+/* Regulatory-accuracy redesign */
+.gateway-wordmark{font:700 20px Georgia;color:#203d3a;text-transform:none;letter-spacing:0}
+.gateway-header nav{display:flex;align-items:center;gap:22px}
+.gateway-header nav a{padding:8px 0;border:0;border-radius:0}
+.development-badge{display:inline-flex;width:max-content;margin:24px 0 0;padding:10px 14px;border-radius:999px;background:#203d3a;color:#fff!important;font-size:11px!important;font-weight:900;letter-spacing:.08em;text-transform:uppercase}
+.development-badge.light{background:#fff;color:#203d3a!important}
+.development-notice{margin:0 0 34px;padding:24px 28px;border-left:5px solid #c39b67;background:#f5f1e8;color:#203d3a}
+.development-notice strong{display:block;margin-bottom:8px;font-size:15px}
+.development-notice p{margin:0;max-width:980px;line-height:1.65}
+.gateway-grid.three-up{grid-template-columns:repeat(3,1fr)}
+.gateway-grid.three-up .gateway-card{min-height:310px;display:block;padding:30px}
+.card-status{display:inline-block;margin-bottom:22px;padding:7px 10px;border-radius:99px;background:#203d3a;color:#fff;font-size:9px;font-weight:900;letter-spacing:.08em;text-transform:uppercase}
+.research-card{background:#334f6b;color:#fff;border:0}.research-card p{color:#e4ebf0}.research-card .card-label,.research-card .text-link{color:#e7c58d}
+.foundation-section,.split-section,.curriculum-development{padding:75px clamp(24px,7vw,110px);display:grid;grid-template-columns:1fr 1.4fr;gap:60px;align-items:start;background:#fff}
+.foundation-section h2,.split-section h2,.curriculum-development h2{margin:0;font:700 clamp(30px,4vw,48px)/1.1 Georgia;color:#203d3a}
+.foundation-section p,.split-section p,.curriculum-development p{color:var(--muted);line-height:1.75}
+.connect-section{padding:75px clamp(24px,7vw,110px);text-align:center;background:#f5f1e8}
+.connect-section h2{margin:0 0 16px;font:700 clamp(32px,4vw,48px) Georgia;color:#203d3a}
+.connect-section>p:not(.overline):not(.vs-eyebrow):not(.family-eyebrow):not(.research-eyebrow){max-width:760px;margin:0 auto 26px;color:var(--muted);line-height:1.7}
+.foundation-button,.research-button{min-height:46px;padding:0 23px;display:inline-flex;align-items:center;justify-content:center;border-radius:4px;background:#203d3a;color:#fff;font-size:10px;font-weight:900;text-transform:uppercase;letter-spacing:.06em}
+.foundation-footer,.research-footer{padding:30px clamp(24px,6vw,96px);display:flex;align-items:center;justify-content:space-between;gap:24px;background:#203d3a;color:#fff;font-size:10px}
+.family-notice,.village-notice,.research-notice{margin:0;border-left:0;border-bottom:1px solid #203d3a22}
+.pathway-section,.research-section,.goals-section{padding:70px clamp(24px,6vw,96px)}
+.simple-heading{margin-bottom:34px}
+.pathway-grid{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+.pathway-grid article{padding:30px;background:#fff;border:1px solid #071f331c;box-shadow:0 12px 30px #071f330d}
+.pathway-grid article>span{display:inline-block;margin-bottom:18px;padding:7px 10px;background:#0b583d;color:#fff;font-size:9px;font-weight:900;letter-spacing:.07em;text-transform:uppercase}
+.pathway-grid h3{margin:0 0 14px;font:700 25px Georgia}.pathway-grid p{margin:0;color:var(--muted);line-height:1.7}
+.curriculum-development{background:#f6f3e7}
+.goals-section{text-align:center;background:#071f33;color:#fff}.goals-section h2{font:700 clamp(30px,4vw,44px) Georgia}.goals-grid{max-width:980px;margin:30px auto 0;display:grid;grid-template-columns:repeat(4,1fr);gap:12px}.goals-grid span{padding:20px 14px;border:1px solid #ffffff2e;background:#ffffff0d;font-weight:700}
+.family-connect{background:#f6f3e7}
+.pillar-grid.four-up{grid-template-columns:repeat(4,1fr)}
+.simplified-network{grid-template-columns:1.2fr 1fr}
+.partner-list{display:grid;grid-template-columns:1fr 1fr;gap:12px}.partner-list span{padding:22px;background:#fff;border:1px solid #073b8820;border-radius:10px;color:var(--blue);font-weight:900}
+.village-goals{background:#062d63}.village-goals>p:last-child{max-width:760px;margin:18px auto 0;color:#dce8f3}
+.revised-footer{grid-template-columns:1.5fr 2fr 1.5fr auto}
+.research{--research:#334f6b;--research-gold:#c39b67;color:#173047;background:#fff}
+.research-header{height:82px;padding:0 clamp(22px,5vw,82px);display:flex;align-items:center;justify-content:space-between;gap:28px;background:#fff;border-bottom:1px solid #334f6b18}.research-header>a:first-child{font:700 20px Georgia;color:var(--research)}.research-header nav{display:flex;gap:26px;font-size:10px;font-weight:900;letter-spacing:.08em;text-transform:uppercase}
+.research-button{background:var(--research)}
+.research-hero{padding:100px clamp(24px,9vw,145px);background:linear-gradient(135deg,#334f6b,#203d3a);color:#fff}.research-hero h1{max-width:800px;margin:0 0 22px;font:700 clamp(44px,6vw,78px)/1 Georgia}.research-hero>p:not(.research-eyebrow):not(.development-badge){max-width:760px;color:#e4ebf0;font-size:18px;line-height:1.7}
+.research-eyebrow{margin:0 0 16px;color:#e7c58d;font-size:11px;font-weight:900;letter-spacing:.15em;text-transform:uppercase}
+.research-section h2{margin:0 0 18px;font:700 clamp(30px,4vw,46px) Georgia;color:var(--research)}
+.concept-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;margin-top:30px}.concept-grid article{padding:28px;border:1px solid #334f6b25;background:#f5f7f8}.concept-grid span{display:block;color:var(--research);font:700 30px Georgia}.concept-grid p{color:var(--muted);line-height:1.65}
+.ethics-section{display:grid;grid-template-columns:1fr 1.4fr;gap:60px;background:#f5f1e8}.ethics-section p{color:var(--muted);line-height:1.75}
+.research-connect .research-eyebrow{color:var(--research)}
+.research-footer{background:var(--research)}
+
+@media(max-width:1050px){.gateway-grid.three-up{grid-template-columns:1fr 1fr}.pillar-grid.four-up{grid-template-columns:repeat(2,1fr)}.research-header nav{display:none}}
+@media(max-width:760px){.gateway-header nav{display:none}.gateway-grid.three-up,.pathway-grid,.foundation-section,.split-section,.curriculum-development,.ethics-section{grid-template-columns:1fr}.goals-grid,.concept-grid{grid-template-columns:1fr 1fr}.revised-footer,.foundation-footer,.research-footer{display:flex;flex-direction:column;text-align:center}.research-hero{padding:70px 24px}.partner-list{grid-template-columns:1fr}}
+@media(max-width:480px){.gateway-grid.three-up,.pillar-grid.four-up,.goals-grid,.concept-grid{grid-template-columns:1fr}}
