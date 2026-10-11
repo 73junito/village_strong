@@ -82,6 +82,15 @@ test("research page identifies concepts as developmental and not validated", asy
   assert.match(html, /PPARS/);
   assert.match(html, /not diagnostic or clinical instruments/i);
   assert.match(html, /appropriate protocol/i);
+  assert.match(html, /Research methods/i);
+  assert.match(html, /Construct development/i);
+  assert.match(html, /Expert content review/i);
+  assert.match(html, /Cognitive interviews/i);
+  assert.match(html, /Pilot administration/i);
+  assert.match(html, /Psychometric validation/i);
+  assert.match(html, /Governance and dissemination/i);
+  assert.match(html, /No participant information or research responses are collected/i);
+  assert.doesNotMatch(html, /validated scale/i);
 });
 
 test("serves a sitemap listing exactly the canonical public routes", async () => {
