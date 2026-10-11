@@ -15,6 +15,51 @@ const concepts = [
   },
 ];
 
+const methods = [
+  {
+    step: "1",
+    name: "Construct development",
+    description:
+      "Define each construct through literature review, father and caregiver perspectives, and clear boundaries between related concepts.",
+  },
+  {
+    step: "2",
+    name: "Item development",
+    description:
+      "Create broad draft item pools, review reading level and inclusivity, and document the rationale for each proposed item.",
+  },
+  {
+    step: "3",
+    name: "Expert content review",
+    description:
+      "Invite qualified experts and people with relevant lived experience to evaluate relevance, clarity, cultural fit, and domain alignment.",
+  },
+  {
+    step: "4",
+    name: "Cognitive interviews",
+    description:
+      "Examine how fathers understand each item, choose responses, and experience wording before any larger pilot study.",
+  },
+  {
+    step: "5",
+    name: "Pilot administration",
+    description:
+      "Use an approved protocol, informed consent, privacy safeguards, and de-identified data to examine feasibility and item performance.",
+  },
+  {
+    step: "6",
+    name: "Psychometric validation",
+    description:
+      "Evaluate factor structure, reliability, convergent and discriminant validity, measurement invariance, and responsiveness in appropriate samples.",
+  },
+  {
+    step: "7",
+    name: "Governance and dissemination",
+    description:
+      "Publish transparent scoring guidance, ethical-use limits, revision history, and evidence only after validation supports interpretation.",
+  },
+];
+
 export default function ResearchPage() {
   return (
     <main className="research">
@@ -23,6 +68,7 @@ export default function ResearchPage() {
         <nav aria-label="Research navigation">
           <a href="#vision">Research vision</a>
           <a href="#concepts">Measurement concepts</a>
+          <a href="#methods">Research methods</a>
           <a href="#ethics">Research ethics</a>
         </nav>
         <Link className="research-button" href="/">Foundation home</Link>
@@ -80,6 +126,25 @@ export default function ResearchPage() {
         </div>
       </section>
 
+      <section id="methods" className="research-section">
+        <p className="research-eyebrow">Research methods</p>
+        <h2>A staged development and validation process.</h2>
+        <p>
+          The proposed FRI, PPARS, and EFAS instruments will move through the
+          following stages before any score interpretation or public-use claim is
+          considered established.
+        </p>
+        <div className="concept-grid">
+          {methods.map((method) => (
+            <article key={method.step}>
+              <span>{method.step}</span>
+              <h3>{method.name}</h3>
+              <p>{method.description}</p>
+            </article>
+          ))}
+        </div>
+      </section>
+
       <section id="ethics" className="research-section ethics-section">
         <div>
           <p className="research-eyebrow">Research ethics</p>
@@ -94,6 +159,10 @@ export default function ResearchPage() {
             Village Strong Foundation will distinguish educational inquiry,
             program-interest communication, and research participation before
             collecting data for any future study.
+          </p>
+          <p>
+            No participant information or research responses are collected through
+            this public page.
           </p>
         </div>
       </section>
