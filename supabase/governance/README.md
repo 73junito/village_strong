@@ -37,6 +37,20 @@ Completing a template does not activate the schema or permit research activity.
   screenshots, issues, or chat.
 - No claim that FRI, PPARS, or EFAS is validated, diagnostic, or clinical.
 
+## Current protocol drafts
+
+The following documents translate the Fatherhood Science workbook v0.3 into
+reviewable planning artifacts. They remain drafts and do not satisfy any
+approval gate in the table below:
+
+- [Fatherhood Science instrument-development protocol v0.1](drafts/fatherhood-science-instrument-development-protocol-v0.1.md)
+- [Research data specification v0.1](drafts/research-data-specification-v0.1.md)
+
+Both drafts are adult-only. They authorize no recruitment, consent,
+instrument administration, data collection, database migration, or public
+application access. Proposed sample sizes and analyses are planning inputs
+subject to investigator, ethics, privacy, and statistical review.
+
 ## Approval record
 
 All fields must be completed before a future implementation PR may cite this
