@@ -17,6 +17,13 @@ apply a migration, create participants, or enable data collection.
 - Instrument versions remain developmental and may not be represented as
   validated, diagnostic, or clinical instruments.
 
+## Governance templates
+
+The review package in [`governance/`](governance/) provides the protocol,
+consent/withdrawal, retention/deletion/incident, access-role, and ethics/IRB
+determination templates required to document these prerequisites. Every gate is
+initially Pending; merging the templates does not approve a study.
+
 ## Approval gate before any live application
 
 Do not run `supabase db push`, paste this migration into the SQL editor, or add
