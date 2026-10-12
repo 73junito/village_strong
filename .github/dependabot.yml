@@ -1,0 +1,45 @@
+version: 2
+
+# Dependency update policy only. No lockfile changes, no automerge,
+# no deployment credentials. Security fixes still arrive as PRs for
+# human review; CI (including the private-config dry run) gates them.
+updates:
+  - package-ecosystem: "npm"
+    directory: "/apps/web"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "09:00"
+      timezone: "UTC"
+    open-pull-requests-limit: 5
+    labels:
+      - "dependencies"
+    groups:
+      minor-patch:
+        patterns:
+          - "*"
+        update-types:
+          - "minor"
+          - "patch"
+    # Major upgrades intentionally stay outside any group, so each
+    # arrives as its own separately reviewable PR.
+
+  - package-ecosystem: "npm"
+    directory: "/orchestration"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "09:00"
+      timezone: "UTC"
+    open-pull-requests-limit: 5
+    labels:
+      - "dependencies"
+    groups:
+      minor-patch:
+        patterns:
+          - "*"
+        update-types:
+          - "minor"
+          - "patch"
+    # Major upgrades intentionally stay outside any group, so each
+    # arrives as its own separately reviewable PR.
