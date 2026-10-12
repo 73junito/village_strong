@@ -1,3 +1,5 @@
+import Link from "next/link";
+
 const plannedAreas = [
   ["Caregiver engagement", "Resources and learning concepts intended to support parents and caregivers."],
   ["Child and adolescent development", "Developmentally informed guidance from birth through age 18."],
@@ -74,7 +76,7 @@ export default function VillageStrongPage() {
             researchers, and community organizations interested in responsible,
             accessible family support.
           </p>
-          <a className="vs-button" href="mailto:darodriguez1274@gmail.com?subject=Village%20Strong%20partnership%20inquiry">Partnership inquiry</a>
+          <Link className="vs-button" href="/partners">Partnership inquiry</Link>
         </div>
         <div className="partner-list" aria-label="Potential Village Strong partners">
           <span>Families and caregivers</span>
@@ -94,7 +96,7 @@ export default function VillageStrongPage() {
         <p className="vs-eyebrow">General interest</p>
         <h2>Contact our team.</h2>
         <p>Submitting an inquiry does not enroll you in a program, guarantee services, or reserve a future place.</p>
-        <a className="vs-button" href="mailto:darodriguez1274@gmail.com?subject=Village%20Strong%20general%20inquiry">Learn more</a>
+        <Link className="vs-button" href="/contact">Learn more</Link>
       </section>
 
     </main>
