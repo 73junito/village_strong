@@ -11,6 +11,19 @@
  * Detection is exact-phrase matching, deliberately narrow to keep false
  * positives low: a broad keyword match would bury a reviewer in noise and
  * train them to ignore the one finding that mattered.
+ *
+ * Phrases are matched exactly but read in clause context, so a claim that is
+ * expressly disclaimed is not flagged. Two negation forms are recognised,
+ * both confined to a single clause (never across sentences or unrelated
+ * clauses):
+ *
+ *   - preceding negation: "does not claim demonstrated outcomes"
+ *   - short-answer negation: "Is enrollment open? No."
+ *
+ * This is intentionally conservative: it can under-flag a genuine claim that
+ * shares a clause with unrelated negation, but for an advisory checker a
+ * false negative that a human still reviews is preferable to a false positive
+ * that trains reviewers to ignore the signal.
  */
 import type { Source } from "../types.ts";
 
@@ -87,21 +100,79 @@ const CLAIM_RULES: ClaimRule[] = [
 ];
 
 /**
+ * A negation cue that, appearing before a claim phrase within the same clause,
+ * disclaims it: "does not claim demonstrated outcomes". The `n't` alternative
+ * catches every English contraction (doesn't, isn't, won't, can't).
+ */
+const PRECEDING_NEGATION = /\b(?:not|never|without|nor|neither|cannot)\b|n't\b/;
+
+/**
+ * A short denial that answers a yes/no question carrying a claim:
+ * "Is enrollment open? No." Matched only at the opening of the clause that
+ * immediately follows the question, so it can never reach across sentences.
+ */
+const SHORT_ANSWER_NEGATION =
+  /^(?:no|nope|never|nah|not yet|not currently|not at this time|not right now)\b/i;
+
+/**
+ * Splits text into clauses, keeping each clause's trailing terminator so a
+ * caller can tell a question ("...?") from a statement ("...", "...").
+ */
+function splitClauses(text: string): string[] {
+  return (
+    text
+      .match(/[^.!?;\n]+[.!?;\n]*/g)
+      ?.map((clause) => clause.trim())
+      .filter((clause) => clause.length > 0) ?? []
+  );
+}
+
+/**
+ * True when a claim phrase at `index` inside `clauses[clauseIndex]` is
+ * disclaimed by its clause context, and so must not be reported.
+ *
+ * Two forms, both confined to the immediate clause so negation never bleeds
+ * across a sentence boundary or an unrelated clause:
+ *   - preceding negation:   "does not claim demonstrated outcomes"
+ *   - short-answer negation: "Is enrollment open? No."
+ */
+function isDisclaimed(clauses: readonly string[], clauseIndex: number, index: number): boolean {
+  const clause = clauses[clauseIndex];
+  if (!clause) return false;
+
+  if (PRECEDING_NEGATION.test(clause.slice(0, index))) return true;
+
+  if (clause.endsWith("?")) {
+    const answer = clauses[clauseIndex + 1];
+    if (answer && SHORT_ANSWER_NEGATION.test(answer)) return true;
+  }
+  return false;
+}
+
+/**
  * Detects prohibited claims in one subject.
  *
  * A subject is either a course {@link Source} (its title is scanned) or a
  * supplied public-site content string. Each rule fires at most once per
  * subject, so a sentence stuffed with synonyms of one claim is still a single
- * finding rather than a pile-up.
+ * finding rather than a pile-up. A claim is reported only if at least one of
+ * its phrases appears in a clause that does not disclaim it.
  */
 export function detectClaims(subject: Source | string): ClaimCandidate[] {
   const id = typeof subject === "string" ? "public-site" : subject.id;
   const source = `${typeof subject === "string" ? "content" : "source"}--${id}`;
   const text = (typeof subject === "string" ? subject : subject.title).toLowerCase();
+  const clauses = splitClauses(text);
 
   const found: ClaimCandidate[] = [];
   for (const rule of CLAIM_RULES) {
-    if (rule.phrases.some((phrase) => text.includes(phrase))) {
+    const isClaimed = clauses.some((clause, clauseIndex) =>
+      rule.phrases.some((phrase) => {
+        const index = clause.indexOf(phrase);
+        return index !== -1 && !isDisclaimed(clauses, clauseIndex, index);
+      }),
+    );
+    if (isClaimed) {
       found.push({
         code: rule.code,
         severity: rule.severity,
