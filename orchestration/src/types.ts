@@ -22,6 +22,12 @@ export interface Finding {
   message: string;
   /** Optional pointer to the offending item, objective or source id. */
   subject?: string;
+  /**
+   * Optional explicit source identifier (e.g. `source--<id>`,
+   * `content--<id>`, or a link-check manifest id). Names the exact input a
+   * finding came from so the report is reproducible during durable replay.
+   */
+  source?: string;
 }
 
 /** Ordered pipeline stage identifiers. The order here IS the gate order. */
