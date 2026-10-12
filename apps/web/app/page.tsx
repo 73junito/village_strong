@@ -29,17 +29,7 @@ const initiatives = [
 
 export default function GatewayPage() {
   return (
-    <main className="gateway">
-      <header className="gateway-header">
-        <Link className="gateway-wordmark" href="/">Village Strong Foundation</Link>
-        <nav aria-label="Primary navigation">
-          <a href="#about">About</a>
-          <a href="#initiatives">Initiatives</a>
-          <Link href="/research">Research</Link>
-          <a href="#connect">Contact</a>
-        </nav>
-      </header>
-
+    <main id="main-content" className="gateway">
       <section className="gateway-intro">
         <p className="overline">Village Strong Foundation</p>
         <h1>Building Stronger Families. Strengthening Communities.</h1>
@@ -105,10 +95,6 @@ export default function GatewayPage() {
         <a className="foundation-button" href="mailto:darodriguez1274@gmail.com">Contact our team</a>
       </section>
 
-      <footer className="foundation-footer">
-        <p>Programs in development. No formal enrollment or credentials currently offered.</p>
-        <a href="mailto:darodriguez1274@gmail.com">darodriguez1274@gmail.com</a>
-      </footer>
     </main>
   );
 }
