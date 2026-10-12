@@ -1,5 +1,3 @@
-import Link from "next/link";
-
 const plannedAreas = [
   ["Caregiver engagement", "Resources and learning concepts intended to support parents and caregivers."],
   ["Child and adolescent development", "Developmentally informed guidance from birth through age 18."],
@@ -9,18 +7,7 @@ const plannedAreas = [
 
 export default function VillageStrongPage() {
   return (
-    <main className="vs">
-      <header className="vs-header">
-        <Link className="vs-brand" href="/"><img src="/village-strong-logo.jpeg" alt="" /><span><b>Village Strong</b><small>Family & Community Support</small></span></Link>
-        <nav aria-label="Village Strong navigation">
-          <a href="#purpose">Purpose</a>
-          <a href="#focus">Planned focus</a>
-          <a href="#partners">Partnerships</a>
-          <Link href="/research">Research</Link>
-        </nav>
-        <Link className="vs-button compact" href="/">Foundation home</Link>
-      </header>
-
+    <main id="main-content" className="vs">
       <section className="vs-hero">
         <div className="vs-hero-copy">
           <p className="vs-eyebrow">Family and community support</p>
@@ -110,12 +97,6 @@ export default function VillageStrongPage() {
         <a className="vs-button" href="mailto:darodriguez1274@gmail.com?subject=Village%20Strong%20general%20inquiry">Learn more</a>
       </section>
 
-      <footer className="vs-footer revised-footer">
-        <div className="vs-brand inverse"><img src="/village-strong-logo.jpeg" alt="" /><span><b>Village Strong</b><small>Family & Community Support</small></span></div>
-        <p>Programs in development. No formal enrollment or credentials currently offered.</p>
-        <a href="mailto:darodriguez1274@gmail.com">darodriguez1274@gmail.com</a>
-        <Link href="/">Foundation home</Link>
-      </footer>
     </main>
   );
 }
