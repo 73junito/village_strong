@@ -1,5 +1,3 @@
-import Link from "next/link";
-
 const concepts = [
   {
     name: "FRI",
@@ -62,18 +60,7 @@ const methods = [
 
 export default function ResearchPage() {
   return (
-    <main className="research">
-      <header className="research-header">
-        <Link href="/">Village Strong Foundation</Link>
-        <nav aria-label="Research navigation">
-          <a href="#vision">Research vision</a>
-          <a href="#concepts">Measurement concepts</a>
-          <a href="#methods">Research methods</a>
-          <a href="#ethics">Research ethics</a>
-        </nav>
-        <Link className="research-button" href="/">Foundation home</Link>
-      </header>
-
+    <main id="main-content" className="research">
       <section className="research-hero">
         <p className="research-eyebrow">Fatherhood Research & Evaluation</p>
         <h1>Advancing Understanding of Fatherhood.</h1>
@@ -174,10 +161,6 @@ export default function ResearchPage() {
         <a className="research-button" href="mailto:darodriguez1274@gmail.com?subject=Fatherhood%20research%20inquiry">Contact our team</a>
       </section>
 
-      <footer className="research-footer">
-        <p>Research and instruments in development. No validated outcomes currently claimed.</p>
-        <Link href="/">Village Strong Foundation</Link>
-      </footer>
     </main>
   );
 }

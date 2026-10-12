@@ -9,18 +9,7 @@ const plannedAreas = [
 
 export default function VillageStrongPage() {
   return (
-    <main className="vs">
-      <header className="vs-header">
-        <Link className="vs-brand" href="/"><img src="/village-strong-logo.jpeg" alt="" /><span><b>Village Strong</b><small>Family & Community Support</small></span></Link>
-        <nav aria-label="Village Strong navigation">
-          <a href="#purpose">Purpose</a>
-          <a href="#focus">Planned focus</a>
-          <a href="#partners">Partnerships</a>
-          <Link href="/research">Research</Link>
-        </nav>
-        <Link className="vs-button compact" href="/">Foundation home</Link>
-      </header>
-
+    <main id="main-content" className="vs">
       <section className="vs-hero">
         <div className="vs-hero-copy">
           <p className="vs-eyebrow">Family and community support</p>
@@ -87,7 +76,7 @@ export default function VillageStrongPage() {
             researchers, and community organizations interested in responsible,
             accessible family support.
           </p>
-          <a className="vs-button" href="mailto:darodriguez1274@gmail.com?subject=Village%20Strong%20partnership%20inquiry">Partnership inquiry</a>
+          <Link className="vs-button" href="/partners">Partnership inquiry</Link>
         </div>
         <div className="partner-list" aria-label="Potential Village Strong partners">
           <span>Families and caregivers</span>
@@ -107,15 +96,9 @@ export default function VillageStrongPage() {
         <p className="vs-eyebrow">General interest</p>
         <h2>Contact our team.</h2>
         <p>Submitting an inquiry does not enroll you in a program, guarantee services, or reserve a future place.</p>
-        <a className="vs-button" href="mailto:darodriguez1274@gmail.com?subject=Village%20Strong%20general%20inquiry">Learn more</a>
+        <Link className="vs-button" href="/contact">Learn more</Link>
       </section>
 
-      <footer className="vs-footer revised-footer">
-        <div className="vs-brand inverse"><img src="/village-strong-logo.jpeg" alt="" /><span><b>Village Strong</b><small>Family & Community Support</small></span></div>
-        <p>Programs in development. No formal enrollment or credentials currently offered.</p>
-        <a href="mailto:darodriguez1274@gmail.com">darodriguez1274@gmail.com</a>
-        <Link href="/">Foundation home</Link>
-      </footer>
     </main>
   );
 }

@@ -2,7 +2,7 @@ import assert from "node:assert/strict";
 import test from "node:test";
 
 const developmentPreviewMeta = /<meta(?=[^>]*\bname=["']codex-preview["'])(?=[^>]*\bcontent=["']development["'])[^>]*>/i;
-const appTitle = /Village Strong\s*\|\s*FAMILY Foundation/i;
+const appTitle = /Village Strong Foundation\s*\|\s*FAMILY/i;
 const canonicalBase = "https://villagestrongfoundation.org";
 
 let workerPromise;
@@ -43,8 +43,8 @@ test("renders development preview metadata", async () => {
 
 test("home presents one foundation and three planning-stage components", async () => {
   const html = await render("/");
-  assert.match(html, /Building Stronger Families\. Strengthening Communities\./i);
-  assert.match(html, /In Development - Not Currently Enrolling/i);
+  assert.match(html, /Helping Fathers Build Stronger Connections\./i);
+  assert.match(html, /Pilot in Development - Enrollment Not Yet Open/i);
   assert.match(html, /Fatherhood Research (?:&|&amp;) Evaluation/i);
   assert.match(html, /not an offer of enrollment/i);
 });
@@ -93,6 +93,54 @@ test("research page identifies concepts as developmental and not validated", asy
   assert.doesNotMatch(html, /validated scale/i);
 });
 
+test("shared navigation exposes the implementation-plan routes", async () => {
+  const html = await render("/");
+  for (const href of [
+    "/about",
+    "/family",
+    "/family/how-it-works",
+    "/resources",
+    "/partners",
+    "/research",
+    "/contact",
+    "/privacy",
+    "/accessibility",
+  ]) {
+    assert.match(html, new RegExp(`href=["']${href.replaceAll("/", "\\/")}["']`));
+  }
+  assert.match(html, /Skip to main content/i);
+});
+
+test("FAMILY describes the proposed hybrid model without opening enrollment", async () => {
+  const family = await render("/family");
+  assert.match(family, /Live virtual/i);
+  assert.match(family, /Regional in person/i);
+  assert.match(family, /Self-paced support/i);
+  assert.match(family, /Resource navigation/i);
+
+  const process = await render("/family/how-it-works");
+  assert.match(process, /Five proposed steps/i);
+  assert.match(process, /Enrollment Not Open/i);
+  assert.match(process, /not therapy, diagnosis, legal representation, or custody evaluation/i);
+});
+
+test("public information pages preserve governance and privacy boundaries", async () => {
+  const partners = await render("/partners");
+  assert.match(partners, /not represented as official partners/i);
+  assert.match(partners, /No Referrals Accepted/i);
+
+  const contact = await render("/contact");
+  assert.match(contact, /protected participant-interest form is not yet active/i);
+  assert.match(contact, /Do not send sensitive or emergency information/i);
+
+  const privacy = await render("/privacy");
+  assert.match(privacy, /Program intake and research data collection are not active/i);
+  assert.match(privacy, /Program participation and optional research consent will remain separate/i);
+
+  const accessibility = await render("/accessibility");
+  assert.match(accessibility, /keyboards, screen readers, mobile devices, zoom, and low-bandwidth access/i);
+});
+
 test("serves a sitemap listing exactly the canonical public routes", async () => {
   const response = await fetchFromWorker("/sitemap.xml", "application/xml");
   assert.equal(response.status, 200);
@@ -104,9 +152,16 @@ test("serves a sitemap listing exactly the canonical public routes", async () =>
   assert.match(xml, /<\/urlset>\n$/);
   assert.deepEqual(await sitemapLocations(), [
     `${canonicalBase}/`,
+    `${canonicalBase}/about`,
     `${canonicalBase}/family`,
+    `${canonicalBase}/family/how-it-works`,
     `${canonicalBase}/village-strong`,
+    `${canonicalBase}/resources`,
+    `${canonicalBase}/partners`,
     `${canonicalBase}/research`,
+    `${canonicalBase}/contact`,
+    `${canonicalBase}/privacy`,
+    `${canonicalBase}/accessibility`,
   ]);
 });
 
