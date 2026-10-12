@@ -32,13 +32,18 @@ export default function GatewayPage() {
     <main id="main-content" className="gateway">
       <section className="gateway-intro">
         <p className="overline">Village Strong Foundation</p>
-        <h1>Building Stronger Families. Strengthening Communities.</h1>
+        <h1>Helping Fathers Build Stronger Connections.</h1>
         <p>
-          Village Strong Foundation is developing community-centered initiatives
-          focused on supporting children, caregivers, fathers, and families. Our
-          proposed programs and research activities are currently in the planning stage.
+          Village Strong Foundation is developing FAMILY, a fatherhood engagement
+          initiative designed for Kentucky fathers through live virtual and regional
+          in-person support. Village Strong continues to develop family and community
+          resources for children, caregivers, and families.
         </p>
-        <p className="development-badge">In Development - Not Currently Enrolling</p>
+        <div className="hero-actions">
+          <Link className="foundation-button" href="/contact">Express Interest</Link>
+          <Link className="secondary-button" href="/partners">Explore Partnerships</Link>
+        </div>
+        <p className="development-badge">Pilot in Development - Enrollment Not Yet Open</p>
       </section>
 
       <section className="development-notice" aria-label="Program development notice">
@@ -92,7 +97,7 @@ export default function GatewayPage() {
           researchers, and prospective partners. Contact does not enroll you in a
           program, guarantee services, or reserve a future place.
         </p>
-        <a className="foundation-button" href="mailto:darodriguez1274@gmail.com">Contact our team</a>
+        <Link className="foundation-button" href="/contact">Contact our team</Link>
       </section>
 
     </main>
