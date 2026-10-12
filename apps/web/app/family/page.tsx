@@ -1,3 +1,5 @@
+import Link from "next/link";
+
 const pathways = [
   {
     status: "Proposed - Not Enrolling",
@@ -22,9 +24,9 @@ export default function FamilyPage() {
           <p className="family-eyebrow">Fatherhood engagement and education program</p>
           <h1>Leading Yourself.<br />Loving Your Family.<br /><em>Leaving a Legacy.</em></h1>
           <p>
-            FAMILY is a proposed fatherhood engagement and education initiative
-            focused on paternal identity, father-child relationships, parenting
-            knowledge, emotional well-being, and meaningful family involvement.
+            FAMILY is a proposed community-based fatherhood engagement initiative
+            designed to help fathers understand barriers affecting their involvement,
+            strengthen parenting and relationship skills, and connect with practical support.
           </p>
           <p className="development-badge light">In Development - Not Currently Enrolling</p>
         </div>
@@ -43,11 +45,23 @@ export default function FamilyPage() {
         <p className="family-eyebrow">Fathers Advancing Meaningful Identity, Leadership & Youth</p>
         <h2>Fatherhood learning designed around family connection.</h2>
         <p>
-          FAMILY is exploring an evidence-informed approach to fatherhood engagement,
-          parenting knowledge, paternal well-being, communication, co-parenting, and
-          meaningful family involvement. These goals describe work under development,
-          not demonstrated program outcomes.
+          FAMILY welcomes adult expectant, resident, nonresident, married, single,
+          separated, returning, and otherwise disengaged fathers. Planned activities
+          include peer discussion, fatherhood education, personal action planning,
+          and resource navigation. These goals describe work under development, not
+          demonstrated program outcomes.
         </p>
+      </section>
+
+      <section className="delivery-section">
+        <p className="family-eyebrow">Proposed hybrid access</p>
+        <h2>Live connection with flexible ways to participate.</h2>
+        <div className="info-grid">
+          <article><h3>Live virtual</h3><p>Closed founder-led cohorts with a secure link, phone dial-in, and no routine recording.</p></article>
+          <article><h3>Regional in person</h3><p>A future accessible gathering in the Elizabethtown-Glasgow-Columbia corridor, subject to venue and readiness.</p></article>
+          <article><h3>Self-paced support</h3><p>Short original or permission-cleared audio, video, printable reflections, and action plans.</p></article>
+          <article><h3>Resource navigation</h3><p>Brief nonclinical check-ins and referral information within defined boundaries.</p></article>
+        </div>
       </section>
 
       <section id="pathways" className="pathway-section">
@@ -104,7 +118,7 @@ export default function FamilyPage() {
         <p className="family-eyebrow">General inquiries</p>
         <h2>Explore partnership opportunities.</h2>
         <p>Contacting us is not an application, enrollment, clinical intake, or promise of future services.</p>
-        <a className="family-button" href="mailto:darodriguez1274@gmail.com?subject=FAMILY%20partnership%20inquiry">Contact our team</a>
+        <div className="hero-actions"><Link className="family-button" href="/family/how-it-works">How it would work</Link><Link className="secondary-button" href="/contact">General contact</Link></div>
       </section>
 
     </main>
