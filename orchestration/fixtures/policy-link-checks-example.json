@@ -1,0 +1,16 @@
+[
+  {
+    "source": "route-manifest@v3",
+    "linkIndex": 0,
+    "url": "https://example.org/mentoring",
+    "route": "/mentoring",
+    "isMissingOrBroken": false
+  },
+  {
+    "source": "route-manifest@v3",
+    "linkIndex": 1,
+    "url": "https://example.org/enrol",
+    "route": "/enrol",
+    "isMissingOrBroken": true
+  }
+]

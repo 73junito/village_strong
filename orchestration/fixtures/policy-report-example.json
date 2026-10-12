@@ -1,0 +1,48 @@
+{
+  "source": "policy-check",
+  "checkedAt": "2026-10-11T00:00:00.000Z",
+  "findings": [
+    {
+      "code": "CLAIM-ENROLLMENT-OPEN",
+      "severity": "blocker",
+      "message": "\"public-site\" claims enrollment is open; confirm the window against the publish schedule.",
+      "subject": "public-site",
+      "source": "content--public-site"
+    },
+    {
+      "code": "CLAIM-CREDENTIALS",
+      "severity": "blocker",
+      "message": "\"public-site\" claims a credential is awarded; confirm the awarding body before this ships.",
+      "subject": "public-site",
+      "source": "content--public-site"
+    },
+    {
+      "code": "CLAIM-RESEARCH-PARTICIPATION",
+      "severity": "warning",
+      "message": "\"public-site\" mentions research participation; confirm consent and review posture.",
+      "subject": "public-site",
+      "source": "content--public-site"
+    },
+    {
+      "code": "CLAIM-FEES",
+      "severity": "blocker",
+      "message": "\"public-site\" makes a claim about fees; confirm it is accurate and current.",
+      "subject": "public-site",
+      "source": "content--public-site"
+    },
+    {
+      "code": "OUTDATED_LINK",
+      "severity": "blocker",
+      "message": "Link 1 (https://example.org/enrol) is reported missing or broken by route-manifest@v3.",
+      "subject": "/enrol",
+      "source": "route-manifest@v3"
+    }
+  ],
+  "metrics": {
+    "prohibitedClaims": 3,
+    "policyWarnings": 1,
+    "outdatedLinks": 1,
+    "claimsReviewed": 2
+  },
+  "passed": false
+}
