@@ -2,8 +2,8 @@
   "$schema": "node_modules/wrangler/config-schema.json",
   // TEST-ONLY configuration. Never deployed.
   //
-  // `@cloudflare/vitest-pool-workers` bundles its own Wrangler (4.124), which
-  // predates the declarative `exports` map and rejects `"type": "workflow"`:
+  // `@cloudflare/vitest-plugin` bundles its own Wrangler, which historically
+  // predated the declarative `exports` map and rejected `"type": "workflow"`:
   //
   //   "exports.ReleasePipelineWorkflow.type" must be "durable-object" or
   //   "worker", but got "workflow".
