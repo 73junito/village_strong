@@ -1,0 +1,25 @@
+name: EOL & final-newline guard
+
+# Enforces that files *changed in a pull request* use LF line endings and end
+# with a final newline. Scoped to the PR diff so pre-existing legacy files do
+# not fail the build; a dedicated renormalization PR cleans those up.
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened, ready_for_review]
+
+permissions:
+  contents: read
+
+jobs:
+  eol-guard:
+    name: EOL & final-newline (changed files)
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout (full history for base diff)
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Run EOL guard against base branch
+        run: bash scripts/check-eol.sh "origin/${{ github.base_ref }}"

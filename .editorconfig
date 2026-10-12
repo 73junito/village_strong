@@ -1,0 +1,40 @@
+# EditorConfig - https://editorconfig.org
+# Keeps final newlines, indentation and charset consistent before a file ever
+# reaches git. Complements .gitattributes (which governs line endings stored
+# in the repository). See orchestration/CONTRIBUTING.md for the fixture/report
+# comparison rule.
+
+root = true
+
+[*]
+charset = utf-8
+end_of_line = lf
+insert_final_newline = true
+trim_trailing_whitespace = true
+indent_style = space
+indent_size = 2
+
+# Python follows PEP 8 (4-space indent).
+[*.py]
+indent_style = space
+indent_size = 4
+
+# Makefiles require tabs.
+[Makefile]
+indent_style = tab
+
+# Markdown: keep trailing double-spaces (they are hard line breaks).
+[*.md]
+trim_trailing_whitespace = false
+
+# CSV: do not alter fields; keep the final newline.
+[*.csv]
+insert_final_newline = true
+trim_trailing_whitespace = false
+
+# Binary assets: no text rules apply.
+[*.{docx,xlsx,pdf,png,jpg,jpeg,gif,ico,woff,woff2,pyc}]
+charset = unset
+end_of_line = unset
+insert_final_newline = unset
+trim_trailing_whitespace = unset
