@@ -1,5 +1,3 @@
-import Link from "next/link";
-
 const pathways = [
   {
     status: "Proposed - Not Enrolling",
@@ -17,18 +15,7 @@ const pathways = [
 
 export default function FamilyPage() {
   return (
-    <main className="family">
-      <header className="family-header">
-        <Link className="family-brand" href="/"><span className="family-mark">F</span><span><b>FAMILY</b><small>FATHERHOOD INITIATIVE</small></span></Link>
-        <nav aria-label="FAMILY navigation">
-          <a href="#purpose">Purpose</a>
-          <a href="#pathways">Planned pathways</a>
-          <a href="#development">Development</a>
-          <Link href="/research">Research</Link>
-        </nav>
-        <Link className="family-button compact" href="/">Foundation home</Link>
-      </header>
-
+    <main id="main-content" className="family">
       <section className="family-hero">
         <div className="family-shade" />
         <div className="family-hero-copy">
@@ -120,12 +107,6 @@ export default function FamilyPage() {
         <a className="family-button" href="mailto:darodriguez1274@gmail.com?subject=FAMILY%20partnership%20inquiry">Contact our team</a>
       </section>
 
-      <footer className="family-footer revised-footer">
-        <div className="family-brand"><span className="family-mark">F</span><span><b>FAMILY</b><small>FATHERHOOD INITIATIVE</small></span></div>
-        <p>Programs in development. No formal enrollment or credentials currently offered.</p>
-        <a href="mailto:darodriguez1274@gmail.com">darodriguez1274@gmail.com</a>
-        <Link href="/">Foundation home</Link>
-      </footer>
     </main>
   );
 }
