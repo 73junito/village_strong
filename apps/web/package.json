@@ -3,10 +3,11 @@
   "version": "0.1.0",
   "private": true,
   "engines": {
-    "node": ">=22.13.0"
+    "node": ">=22.13.0 <23"
   },
   "scripts": {
     "install:ci": "node scripts/install-ci.mjs",
+    "runtime:check": "node ../../scripts/check-node-runtime.mjs",
     "dev": "vite",
     "build": "node scripts/build-verified.mjs",
     "start": "vinext start",

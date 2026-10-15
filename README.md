@@ -38,8 +38,10 @@ max 5 open PRs each); `npm audit` is clean in both packages.
 
 ## Local setup and validation
 
-Prerequisites: Node.js `>=22.13.0`. Wrangler login only for Cloudflare API
-commands; dev servers and dry-runs stay local.
+Prerequisites: Node.js `22.13.0` or later within the Node 22 LTS line. The
+repository `.nvmrc` selects Node 22; CI also verifies the runtime contract before
+building either Node surface. Wrangler login is only for Cloudflare API commands;
+dev servers and dry-runs stay local.
 
 ```bash
 # Web
@@ -70,6 +72,9 @@ npm audit                 # must report 0 vulnerabilities
   (see its README Limitations).
 - **The two Workers share nothing**: no domains, data, identity, secrets,
   Durable Object namespaces, or admin interfaces.
+- **Web runtime health:** `GET /healthz` returns only the service name and an
+  `ok` status with `Cache-Control: no-store`. It intentionally exposes no
+  deployment SHA, bindings, credentials, or internal diagnostics.
 
 ## Governance restrictions
 

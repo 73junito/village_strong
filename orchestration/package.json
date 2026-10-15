@@ -4,10 +4,11 @@
   "private": true,
   "type": "module",
   "engines": {
-    "node": ">=22.13.0"
+    "node": ">=22.13.0 <23"
   },
   "scripts": {
     "dev": "wrangler dev",
+    "runtime:check": "node ../scripts/check-node-runtime.mjs",
     "check:private-config": "wrangler deploy --config wrangler.jsonc --dry-run",
     "cf:types": "wrangler types env.d.ts",
     "review": "node scripts/review.ts",

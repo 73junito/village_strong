@@ -83,6 +83,9 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
+      - name: Verify runtime contract
+        run: npm run runtime:check
+
       - name: Lint
         run: npm run lint
 
@@ -118,6 +121,9 @@ jobs:
 
       - name: Install dependencies
         run: npm ci
+
+      - name: Verify runtime contract
+        run: npm run runtime:check
 
       # env.d.ts is generated (and gitignored) from wrangler.jsonc, so it must be
       # rebuilt before typechecking or the Env bindings will not exist at all.
