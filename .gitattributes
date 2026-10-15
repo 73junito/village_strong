@@ -1,0 +1,39 @@
+# Line endings
+# ------------
+# Store every text file with LF and check it out with LF, so a fixture or
+# generated report is byte-identical on Windows, macOS and Linux. `text=auto`
+# lets git tell text from binary; `eol=lf` forces LF on checkout. Binary
+# formats are pinned below so git never rewrites their bytes.
+* text=auto eol=lf
+
+# Source and config (explicit for readability; these override anything above).
+*.ts      text eol=lf
+*.tsx     text eol=lf
+*.js      text eol=lf
+*.mjs     text eol=lf
+*.cjs     text eol=lf
+*.json    text eol=lf
+*.jsonc   text eol=lf
+*.md      text eol=lf
+*.csv     text eol=lf
+*.yml     text eol=lf
+*.yaml    text eol=lf
+*.py      text eol=lf
+*.sh      text eol=lf
+*.css     text eol=lf
+*.html    text eol=lf
+*.svg     text eol=lf
+*.txt     text eol=lf
+
+# Binary — never normalize line endings, never diff as text.
+*.docx    binary
+*.xlsx    binary
+*.pdf     binary
+*.png     binary
+*.jpg     binary
+*.jpeg    binary
+*.gif     binary
+*.ico     binary
+*.woff    binary
+*.woff2   binary
+*.pyc     binary
