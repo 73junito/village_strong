@@ -1,0 +1,12 @@
+{
+  "source": "policy-check",
+  "checkedAt": "2026-10-12T00:00:00.000Z",
+  "findings": [],
+  "metrics": {
+    "prohibitedClaims": 0,
+    "policyWarnings": 0,
+    "outdatedLinks": 0,
+    "claimsReviewed": 1
+  },
+  "passed": true
+}

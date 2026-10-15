@@ -135,3 +135,37 @@ test("a run is reproducible: identical inputs yield an identical report", () => 
 
   assert.deepEqual(first, second);
 });
+
+test("a claim disclaimed by preceding negation in the same clause is not reported", () => {
+  const report = runPolicyCheck(cleanPolicySubmission(), POLICY_NOW, {
+    content: "It does not claim demonstrated outcomes.",
+  });
+  assert.deepEqual(report.findings, []);
+  assert.equal(report.passed, true);
+});
+
+test("contraction negation (aren't) disclaims a claim present in the clause", () => {
+  const report = runPolicyCheck(cleanPolicySubmission(), POLICY_NOW, {
+    content: "We aren't accepting applications right now.",
+  });
+  assert.deepEqual(report.findings, []);
+});
+
+test("a claim disclaimed by a short answer to a yes/no question is not reported", () => {
+  const report = runPolicyCheck(cleanPolicySubmission(), POLICY_NOW, {
+    content: "Is enrollment open? No. The pilot is still in development.",
+  });
+  assert.ok(!codesOf(report.findings).includes("CLAIM-ENROLLMENT-OPEN"));
+});
+
+test("negation is clause-scoped: an undisclaimed claim in a later clause still fires", () => {
+  // Clause 1 disclaims "demonstrated outcomes"; clause 2 asserts "proven
+  // outcomes" (same rule). Because negation is clause-scoped, the rule must
+  // still fire — a disclaim in one sentence does not cover the next.
+  const report = runPolicyCheck(cleanPolicySubmission(), POLICY_NOW, {
+    content: "It does not claim demonstrated outcomes. Proven outcomes drive our design.",
+  });
+  assert.equal(report.passed, false);
+  assert.ok(codesOf(report.findings).includes("CLAIM-OUTCOMES"));
+});
+

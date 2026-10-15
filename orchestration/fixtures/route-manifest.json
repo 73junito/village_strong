@@ -1,0 +1,13 @@
+[
+  { "source": "sitemap@2026-10-12", "linkIndex": 0, "url": "https://villagestrongfoundation.org/", "route": "/", "isMissingOrBroken": false },
+  { "source": "sitemap@2026-10-12", "linkIndex": 1, "url": "https://villagestrongfoundation.org/about", "route": "/about", "isMissingOrBroken": false },
+  { "source": "sitemap@2026-10-12", "linkIndex": 2, "url": "https://villagestrongfoundation.org/family", "route": "/family", "isMissingOrBroken": false },
+  { "source": "sitemap@2026-10-12", "linkIndex": 3, "url": "https://villagestrongfoundation.org/family/how-it-works", "route": "/family/how-it-works", "isMissingOrBroken": false },
+  { "source": "sitemap@2026-10-12", "linkIndex": 4, "url": "https://villagestrongfoundation.org/village-strong", "route": "/village-strong", "isMissingOrBroken": false },
+  { "source": "sitemap@2026-10-12", "linkIndex": 5, "url": "https://villagestrongfoundation.org/resources", "route": "/resources", "isMissingOrBroken": false },
+  { "source": "sitemap@2026-10-12", "linkIndex": 6, "url": "https://villagestrongfoundation.org/partners", "route": "/partners", "isMissingOrBroken": false },
+  { "source": "sitemap@2026-10-12", "linkIndex": 7, "url": "https://villagestrongfoundation.org/research", "route": "/research", "isMissingOrBroken": false },
+  { "source": "sitemap@2026-10-12", "linkIndex": 8, "url": "https://villagestrongfoundation.org/contact", "route": "/contact", "isMissingOrBroken": false },
+  { "source": "sitemap@2026-10-12", "linkIndex": 9, "url": "https://villagestrongfoundation.org/privacy", "route": "/privacy", "isMissingOrBroken": false },
+  { "source": "sitemap@2026-10-12", "linkIndex": 10, "url": "https://villagestrongfoundation.org/accessibility", "route": "/accessibility", "isMissingOrBroken": false }
+]
