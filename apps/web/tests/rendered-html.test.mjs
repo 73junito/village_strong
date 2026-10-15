@@ -41,6 +41,17 @@ test("renders development preview metadata", async () => {
   assert.match(await render("/"), developmentPreviewMeta);
 });
 
+test("exposes a minimal no-store health check", async () => {
+  const response = await fetchFromWorker("/healthz", "application/json");
+  assert.equal(response.status, 200);
+  assert.match(response.headers.get("content-type") ?? "", /^application\/json\b/i);
+  assert.equal(response.headers.get("cache-control"), "no-store");
+  assert.deepEqual(await response.json(), {
+    status: "ok",
+    service: "village-strong",
+  });
+});
+
 test("home presents one foundation and three planning-stage components", async () => {
   const html = await render("/");
   assert.match(html, /Helping Fathers Build Stronger Connections\./i);
