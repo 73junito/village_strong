@@ -22,8 +22,8 @@ import { cleanSubmission } from "../fixtures.ts";
 const TOKEN = "test-token-do-not-use";
 const AUTH = { authorization: `Bearer ${TOKEN}` };
 
-/** Starts a run and waits until it stops moving. */
-async function run(courseId: string, sources = true) {
+/** Starts a run and waits for a terminal durable status. */
+async function run(courseId: string, sources = true, maxAttempts = 150) {
   const submission = cleanSubmission({ courseId });
   if (!sources) submission.sources = [];
 
@@ -35,18 +35,20 @@ async function run(courseId: string, sources = true) {
   expect(response.status).toBe(202);
 
   const { runId } = (await response.json()) as { runId: string };
+  let lastStatus = "unknown";
 
-  const deadline = Date.now() + 30_000;
-  for (;;) {
+  for (let attempt = 0; attempt < maxAttempts; attempt += 1) {
     const status = (await (
       await SELF.fetch(`https://orchestrator.test/api/runs/${runId}`, { headers: AUTH })
     ).json()) as { status: string };
+    lastStatus = status.status;
 
-    if (status.status !== "queued" && status.status !== "running") return { runId, status: status.status };
+    if (lastStatus !== "queued" && lastStatus !== "running") return { runId, status: lastStatus };
 
-    if (Date.now() > deadline) throw new Error(`${runId} never settled (saw ${status.status}).`);
     await new Promise((resolve) => setTimeout(resolve, 200));
   }
+
+  throw new Error(`${runId} never settled after ${maxAttempts} checks (saw ${lastStatus}).`);
 }
 
 const mint = (runId: string) =>
